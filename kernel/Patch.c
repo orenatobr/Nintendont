@@ -1814,6 +1814,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 	u32 cheatsWanted = 0, debuggerWanted = 0;
 	if(ConfigGetConfig(NIN_CFG_CHEATS))
 		cheatsWanted = 1;
+	else if(strcmp(ConfigGetGamePath(), "di") == 0 && Check_Cheats() == 0)
+	{	//Teconmoon: a Wii U (WUP) game cannot tick Cheats, so a /codes/<game id>.gct on the card is enough
+		dbgprintf("Patch:Cheats on for a Wii U disc game, found %s\r\n", cheatPath);
+		cheatsWanted = 1;
+	}
 	if(!IsWiiU() && ConfigGetConfig(NIN_CFG_DEBUGGER))
 		debuggerWanted = 1;
 	if(cheatsWanted || debuggerWanted)
@@ -1837,6 +1842,9 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		PatchCount &= ~(FPATCH_VideoModes | FPATCH_VIConfigure | FPATCH_getTiming);
 		videoPatches = 1;
 	}
+	//Teconmoon: log what the video options came to, the picture (bars, blur, 50 or 60 Hz) depends on it
+	dbgprintf("Video: Force Progressive=%d, video mode word=%08x, game video patches=%d\r\n",
+		ConfigGetConfig(NIN_CFG_FORCE_PROG) != 0, ConfigGetVideoMode(), videoPatches);
 
 	if(ConfigGetConfig(NIN_CFG_BBA_EMU))
 	{

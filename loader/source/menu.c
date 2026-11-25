@@ -874,6 +874,9 @@ static const char *const *GetSettingsDescription(const MenuCtx *ctx)
 					"",
 					"Requires component cables, or",
 					"an HDMI cable on Wii U.",
+					"",
+					"Ignored on PAL games: 60 Hz",
+					"delays their audio.",
 					NULL
 				};
 				return desc_force_prog;

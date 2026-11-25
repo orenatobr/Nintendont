@@ -48,6 +48,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "TRI.h"
 #include "Config.h"
 #include "wdvd.h"
+#include "GameSettings.h"
+#include <ctype.h>
 
 #include "ff_utf8.h"
 #include "diskio.h"
@@ -554,6 +556,77 @@ static char dev_es[] ATTRIBUTE_ALIGN(32) = "/dev/es";
 
 extern vu32 FoundVersion;
 extern void _jmp813();
+/* Set when the game's own settings file asks for Force Progressive or Patch PAL50: the PAL guard then leaves that option alone. */
+static bool gsKeepProg = false, gsKeepPal50 = false, gsKeepVideo = false;
+
+/* Teconmoon: /teconmoon/<game id>.ini overrides a few options for this start only, nincfg.bin is not changed (see GameSettings.h). */
+static void ApplyGameSettings(void)
+{
+	char id[5];
+	memcpy(id, &ncfg->GameID, 4);
+	id[4] = 0;
+	int i;
+	for (i = 0; i < 4; i++)
+		if (!isalnum((unsigned char)id[i]))
+			return;
+	char path[40];
+	snprintf(path, sizeof(path), "%s:/teconmoon/%s.ini", GetRootDevice(), id);
+	static char text[4096];
+	FIL f;
+	UINT read = 0;
+	if (f_open_char(&f, path, FA_READ|FA_OPEN_EXISTING) != FR_OK)
+		return;
+	FRESULT res = f_read(&f, text, sizeof(text) - 1, &read);
+	f_close(&f);
+	if (res != FR_OK)
+		return;
+	text[read] = 0;
+	signed char set[GS_COUNT];
+	int n = GameSettingsParse(text, set);
+	gprintf("Game settings: %s, %d setting(s)\r\n", path, n);
+	static const struct { u32 bit; const char *name; } map[GS_PATCH_PAL50] =
+	{
+		[GS_WIIU_WIDE] = { NIN_CFG_WIIU_WIDE, "Wii U Widescreen" },
+		[GS_FORCE_WIDE] = { NIN_CFG_FORCE_WIDE, "Force Widescreen" },
+		[GS_FORCE_PROG] = { NIN_CFG_FORCE_PROG, "Force Progressive" },
+		[GS_SKIP_IPL] = { NIN_CFG_SKIP_IPL, "Skip IPL" },
+	};
+	for (i = 0; i < GS_PATCH_PAL50; i++)
+	{
+		if (set[i] < 0)
+			continue;
+		if (set[i])
+			ncfg->Config |= map[i].bit;
+		else
+			ncfg->Config &= ~map[i].bit;
+		gprintf("Game settings: %s %s\r\n", map[i].name, set[i] ? "on" : "off");
+	}
+	//Patch PAL50 lives in the video mode word, not in Config
+	if (set[GS_PATCH_PAL50] >= 0)
+	{
+		if (set[GS_PATCH_PAL50])
+			ncfg->VideoMode |= NIN_VID_PATCH_PAL50;
+		else
+			ncfg->VideoMode &= ~NIN_VID_PATCH_PAL50;
+		gprintf("Game settings: Patch PAL50 %s\r\n", set[GS_PATCH_PAL50] ? "on" : "off");
+	}
+	//a forced video mode lives in the video mode word too: Force (deflicker off) or Force (Deflicker), plus the mode
+	if (set[GS_VIDEO_MODE] >= 0)
+	{
+		static const u32 modes[] = { 0, NIN_VID_FORCE_PAL50, NIN_VID_FORCE_PAL60, NIN_VID_FORCE_NTSC, NIN_VID_FORCE_MPAL };
+		static const char *const names[] = { "Auto", "PAL50", "PAL60", "NTSC", "MPAL" };
+		ncfg->VideoMode &= ~(NIN_VID_MASK | NIN_VID_FORCE_MASK);
+		if (set[GS_VIDEO_MODE] == 0)
+			ncfg->VideoMode |= NIN_VID_AUTO;
+		else
+			ncfg->VideoMode |= (set[GS_DEFLICKER] == 1 ? NIN_VID_FORCE_DF : NIN_VID_FORCE) | modes[(int)set[GS_VIDEO_MODE]];
+		gprintf("Game settings: Video mode %s, deflicker %s\r\n", names[(int)set[GS_VIDEO_MODE]], set[GS_DEFLICKER] == 1 ? "on" : "off");
+	}
+	gsKeepProg = set[GS_FORCE_PROG] == 1;
+	gsKeepPal50 = set[GS_PATCH_PAL50] == 1;
+	gsKeepVideo = set[GS_VIDEO_MODE] > 0;
+}
+
 int main(int argc, char **argv)
 {
 	// Exit after 10 seconds if there is an error
@@ -1026,6 +1099,10 @@ int main(int argc, char **argv)
 		ExitToLoader(1);
 	}
 
+	//Teconmoon: per game settings. The game id is final, the card is still open and nincfg.bin is already
+	//written (so nothing here is saved), and everything that reads these options comes after this.
+	ApplyGameSettings();
+
 	// Save the ISO shift value for multi-game discs.
 	*(vu32*)0xD300300C = ISOShift;
 
@@ -1231,6 +1308,32 @@ int main(int argc, char **argv)
 		//forcing it would mess with the interal game setup
 		gprintf("Disabling Force Progressive for this game\r\n");
 		ncfg->Config &= ~NIN_CFG_FORCE_PROG;
+	}
+
+	if(BI2region == BI2_REGION_PAL)
+	{	//A PAL game forced to 60 Hz plays its sound late against the picture (Force Progressive was
+		//confirmed on Skies of Arcadia). Keep PAL discs at their own 50 Hz whatever the config says.
+		if((ncfg->Config & NIN_CFG_FORCE_PROG) && gsKeepProg)
+			gprintf("PAL disc: Force Progressive kept, the game settings ask for it\r\n");
+		else if(ncfg->Config & NIN_CFG_FORCE_PROG)
+		{
+			gprintf("PAL disc: Force Progressive ignored, it delays the audio\r\n");
+			ncfg->Config &= ~NIN_CFG_FORCE_PROG;
+		}
+		if((ncfg->VideoMode & NIN_VID_PATCH_PAL50) && gsKeepPal50)
+			gprintf("PAL disc: Patch PAL50 kept, the game settings ask for it\r\n");
+		else if(ncfg->VideoMode & NIN_VID_PATCH_PAL50)
+		{
+			gprintf("PAL disc: Patch PAL50 ignored, it delays the audio\r\n");
+			ncfg->VideoMode &= ~NIN_VID_PATCH_PAL50;
+		}
+		if((ncfg->VideoMode & NIN_VID_FORCE) && (ncfg->VideoMode & NIN_VID_FORCE_MASK) != NIN_VID_FORCE_PAL50 && gsKeepVideo)
+			gprintf("PAL disc: forced video mode kept, the game settings ask for it\r\n");
+		else if((ncfg->VideoMode & NIN_VID_FORCE) && (ncfg->VideoMode & NIN_VID_FORCE_MASK) != NIN_VID_FORCE_PAL50)
+		{
+			gprintf("PAL disc: forced 60 Hz video mode ignored, it delays the audio\r\n");
+			ncfg->VideoMode &= ~NIN_VID_FORCE;
+		}
 	}
 
 	//make sure the cfg gets to the kernel
@@ -1510,7 +1613,19 @@ int main(int argc, char **argv)
 		while(!__SYS_SyncSram());
 	}
 	
+	//Teconmoon: stay black while the video mode changes and blank the framebuffer the loader still shows, so no stale lines (the green stripe at the bottom of the screen, upstream issue 1301) are scanned out
+	VIDEO_SetBlack(TRUE);
+	VIDEO_Flush();
+	VIDEO_WaitVSync();
 	ReconfigVideo(vmode);
+	{
+		void *cur = VIDEO_GetCurrentFramebuffer();
+		if(cur != NULL)
+		{
+			VIDEO_ClearFrameBuffer(rmode, cur, COLOR_BLACK);
+			DCFlushRange(cur, rmode->fbWidth * rmode->xfbHeight * 2);
+		}
+	}
 	VIDEO_SetBlack(FALSE);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();

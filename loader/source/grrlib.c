@@ -73,6 +73,9 @@ int  GRRLIB_Init (void) {
 	if (is_setup)  return 0;
 	
 	VIDEO_Init();
+	//Teconmoon: nothing is scanned out until the first frame is drawn (GRRLIB_Render turns the output on), so leftovers of the previous screen cannot show as a green stripe
+	VIDEO_SetBlack(TRUE);
+	VIDEO_Flush();
 
 	if(CONF_GetProgressiveScan() > 0 && VIDEO_HaveComponentCable())
 	{

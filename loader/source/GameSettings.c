@@ -23,6 +23,16 @@ static int Bool(const char *v)
 	return -1;
 }
 
+/* the number in s when it is between lo and hi, plus bias; -1 otherwise */
+static int Num(const char *s, int lo, int hi, int bias)
+{
+	char *e;
+	long n = strtol(s, &e, 10);
+	if (e == s || *e || n < lo || n > hi)
+		return -1;
+	return (int)n + bias;
+}
+
 int GameSettingsParse(char *text, signed char out[GS_COUNT])
 {
 	int i, n = 0;
@@ -58,6 +68,10 @@ int GameSettingsParse(char *text, signed char out[GS_COUNT])
 			which = GS_PATCH_PAL50, v = Bool(val);
 		else if (!strcasecmp(key, "Deflicker"))
 			which = GS_DEFLICKER, v = Bool(val);
+		else if (!strcasecmp(key, "VideoScale"))
+			which = GS_VIDEO_SCALE, v = Num(val, 40, 120, 0);
+		else if (!strcasecmp(key, "VideoOffset"))
+			which = GS_VIDEO_OFFSET, v = Num(val, -20, 20, 64);
 		else if (!strcasecmp(key, "VideoMode"))
 		{
 			which = GS_VIDEO_MODE;

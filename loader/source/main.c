@@ -622,6 +622,17 @@ static void ApplyGameSettings(void)
 			ncfg->VideoMode |= (set[GS_DEFLICKER] == 1 ? NIN_VID_FORCE_DF : NIN_VID_FORCE) | modes[(int)set[GS_VIDEO_MODE]];
 		gprintf("Game settings: Video mode %s, deflicker %s\r\n", names[(int)set[GS_VIDEO_MODE]], set[GS_DEFLICKER] == 1 ? "on" : "off");
 	}
+	//the picture's width and position, the menu's Video Width and Video Offset, for this start only
+	if (set[GS_VIDEO_SCALE] >= 0)
+	{
+		ncfg->VideoScale = set[GS_VIDEO_SCALE];
+		gprintf("Game settings: Video width %d\r\n", set[GS_VIDEO_SCALE]);
+	}
+	if (set[GS_VIDEO_OFFSET] >= 0)
+	{
+		ncfg->VideoOffset = set[GS_VIDEO_OFFSET] - 64;
+		gprintf("Game settings: Video offset %d\r\n", set[GS_VIDEO_OFFSET] - 64);
+	}
 	gsKeepProg = set[GS_FORCE_PROG] == 1;
 	gsKeepPal50 = set[GS_PATCH_PAL50] == 1;
 	gsKeepVideo = set[GS_VIDEO_MODE] > 0;

@@ -1884,6 +1884,20 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 			}
 		}
 		dbgprintf("Mode448: %d site(s)\r\n", hits);
+		//any word that is fbWidth 640 and efbHeight 448 (the +4 word of a mode), with the words around it, whatever the other fields are
+		hits = 0;
+		for(j = 8; j + 40 <= Length && hits < 24; j += 4)
+		{
+			if(read32((u32)Buffer + j) == 0x028001C0)
+			{
+				dbgprintf("Tmpl448: 0x%08X: %08X %08X [%08X] %08X %08X %08X %08X %08X %08X %08X\r\n", (u32)Buffer + j,
+					read32((u32)Buffer + j - 8), read32((u32)Buffer + j - 4), read32((u32)Buffer + j), read32((u32)Buffer + j + 4),
+					read32((u32)Buffer + j + 8), read32((u32)Buffer + j + 12), read32((u32)Buffer + j + 16), read32((u32)Buffer + j + 20),
+					read32((u32)Buffer + j + 24), read32((u32)Buffer + j + 28));
+				hits++;
+			}
+		}
+		dbgprintf("Tmpl448: %d table(s) with fb 640 and efb 448\r\n", hits);
 	}
 	if(TITLE_ID == 0x474D53)
 	{	//Teconmoon: Sunshine builds a 448 line video mode; make it 480 lines, with or without Force Widescreen (see Sunshine480.h).

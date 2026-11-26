@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.5] - 2026-11-26
+
+### Fixed
+- XFB Scan crashed the Wii U to a black screen (6.510-fork.3 and 6.510-fork.4): the kernel (ARM) read the video
+  registers at an assumed address `0x0d002000`, which is not valid for it. The PPC hook of the game
+  (`PADReadGC.c`) now reads the video registers, where `0xCC002000` is real, and leaves the XFB address and the
+  raw registers at `0x13003F00`. The kernel reads the XFB from main memory, which is safe, measures the bars and
+  writes the log line. The detector (`NinScanBars`) no longer needs work buffers: it scans from the edges
+  inwards and stops at the first row or column that is not black. The first attempt to measure inside the hook
+  did not fit: that hook has only 12 KB.
+
 ## [6.510-fork.4] - 2026-11-26
 
 ### Added
@@ -74,7 +85,8 @@ All notable changes of this fork are listed here. The fork follows
   static video tables of Super Mario Sunshine already fill all 480 lines (`ndebug.log`, `Patch:VI table`).
 - Not tried on a console when this entry was written.
 
-[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.4...HEAD
+[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.5...HEAD
+[6.510-fork.5]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.4...v6.510-fork.5
 [6.510-fork.4]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.3...v6.510-fork.4
 [6.510-fork.3]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.2...v6.510-fork.3
 [6.510-fork.2]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.1...v6.510-fork.2

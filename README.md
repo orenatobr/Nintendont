@@ -11,6 +11,9 @@ this fork in this repository, not to the upstream authors.
   off the game keeps its own 4:3 window. A letterboxed video mode table (for example 448 lines from line 16) is
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
+* **Status of the Sunshine bars: not fixed on hardware yet.** `v6.510-fork.7` (pre-release) is an experimental
+  attempt: with Force Widescreen on, Super Mario Sunshine is made to use 480 lines instead of 448. It has not been
+  confirmed on a console. `v6.510-fork.3` and `v6.510-fork.4` crash a Wii U when XFB Scan is on; do not use them.
 * **Status: the automatic stretch does not exist yet.** What is built is the bar detector (XFB Scan, logging only)
   and the plan for the stretch, tested on a Mac. Nothing in the fork crops or scales a game's picture yet.
 * **Black bar detection (experimental).** The settings menu has XFB Scan (off by default). It logs the black bars

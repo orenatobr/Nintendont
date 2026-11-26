@@ -1862,6 +1862,28 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 			}
 		}
 		dbgprintf("Scan448: %d site(s) in 0x%08X, length 0x%X\r\n", hits, (u32)Buffer, Length);
+		//a 448 that is stored into the efbHeight, xfbHeight or viHeight field of a mode: sth rD,6|8|0x10(rX) within the next 8 words
+		hits = 0;
+		for(j = 8; j + 40 <= Length && hits < 40; j += 4)
+		{
+			u32 w = read32((u32)Buffer + j), rD = (w >> 21) & 31, k;
+			if((w & 0xFC1FFFFF) != 0x380001C0)
+				continue;
+			for(k = 1; k <= 8; k++)
+			{
+				u32 x = read32((u32)Buffer + j + 4 * k), off = x & 0xFFFF;
+				if((x & 0xFC000000) == 0xB0000000 && ((x >> 21) & 31) == rD && (off == 6 || off == 8 || off == 0x10))
+				{
+					dbgprintf("Mode448: 0x%08X: %08X %08X [%08X] %08X %08X %08X %08X %08X %08X %08X %08X\r\n", (u32)Buffer + j,
+						read32((u32)Buffer + j - 8), read32((u32)Buffer + j - 4), w, read32((u32)Buffer + j + 4), read32((u32)Buffer + j + 8),
+						read32((u32)Buffer + j + 12), read32((u32)Buffer + j + 16), read32((u32)Buffer + j + 20), read32((u32)Buffer + j + 24),
+						read32((u32)Buffer + j + 28), read32((u32)Buffer + j + 32));
+					hits++;
+					break;
+				}
+			}
+		}
+		dbgprintf("Mode448: %d site(s)\r\n", hits);
 	}
 	if(TITLE_ID == 0x474D53)
 	{	//Teconmoon: Sunshine builds a 448 line video mode; make it 480 lines, with or without Force Widescreen (see Sunshine480.h).

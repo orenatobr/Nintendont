@@ -81,11 +81,32 @@ bool isWidescreen = false;
 #define NIN_XFB_SCAN_MEM	(0x13003F00)
 #define NIN_XFB_W		(640)
 #define NIN_XFB_H		(480)
+/* the video mode the game passes to VIConfigure, left by the hook at 0x13003F20 (see VIWidthHook.S) */
+static void XfbLogViMode(void)
+{
+	static u32 lastPtr = 0, lastSum = 0;
+	u32 ptr, p, sum;
+	sync_before_read((void*)NIN_XFB_SCAN_MEM, 0x40);
+	ptr = read32(NIN_XFB_SCAN_MEM + 0x20);
+	p = ptr & 0x017FFFFF;
+	if(ptr < 0x80000000 || ptr >= 0x81800000)
+		return;
+	sync_before_read((void*)(p & ~31u), 0x60);
+	sum = read32(p) ^ read32(p + 4) ^ read32(p + 8) ^ read32(p + 0xC) ^ read32(p + 0x10) ^ read32(p + 0x14);
+	if(ptr == lastPtr && sum == lastSum)
+		return;
+	lastPtr = ptr;
+	lastSum = sum;
+	dbgprintf("VI mode: 0x%08X tv=%08x fb=%d efb=%d xfb=%d xorig=%d yorig=%d w=%d h=%d xfbmode=%d\r\n", ptr, read32(p),
+		read16(p + 4), read16(p + 6), read16(p + 8), read16(p + 0xA), read16(p + 0xC), read16(p + 0xE), read16(p + 0x10), read32(p + 0x14));
+}
+
 static void XfbBarScan(void)
 {
 	static u32 lastSeq = 0, lastKey = 0xFFFFFFFF, quiet = 0;
 	u32 seq, xfb, key;
 	NinBars b;
+	XfbLogViMode();
 	sync_before_read((void*)NIN_XFB_SCAN_MEM, 0x20);
 	seq = read32(NIN_XFB_SCAN_MEM);
 	if(seq == lastSeq)
@@ -315,8 +336,8 @@ int _main( int argc, char *argv[] )
 	u32 XfbScanTimer = Now;
 	if(ConfigGetConfig(NIN_CFG_XFB_SCAN))
 	{	//clear what the PPC hook reports, the memory can hold old data
-		memset((void*)NIN_XFB_SCAN_MEM, 0, 0x20);
-		sync_after_write((void*)NIN_XFB_SCAN_MEM, 0x20);
+		memset((void*)NIN_XFB_SCAN_MEM, 0, 0x40);
+		sync_after_write((void*)NIN_XFB_SCAN_MEM, 0x40);
 	}
 #ifdef PERFMON
 	u32 loopCnt = 0;

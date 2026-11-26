@@ -1862,8 +1862,9 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		}
 		dbgprintf("Scan448: %d site(s) in 0x%08X, length 0x%X\r\n", hits, (u32)Buffer, Length);
 	}
-	if(TITLE_ID == 0x474D53 && ConfigGetConfig(NIN_CFG_FORCE_WIDE))
-	{	//Teconmoon: Sunshine builds a 448 line video mode; with Force Widescreen on make it 480 lines (see Sunshine480.h)
+	if(TITLE_ID == 0x474D53)
+	{	//Teconmoon: Sunshine builds a 448 line video mode; make it 480 lines, with or without Force Widescreen (see Sunshine480.h).
+		//The width is what Force Widescreen decides: on fills 688 pixels, off keeps the game's own 4:3 window.
 		u32 changed = NinPatch448Lines((volatile unsigned*)Buffer, Length / 4);
 		dbgprintf("Patch:[Sunshine 480 lines] %d site(s) changed in 0x%08X\r\n", changed, (u32)Buffer);
 	}
@@ -2150,8 +2151,8 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 				if( BufAt0 == 0x3C608000 && (BufAt4 & 0xFC1FFFFF) == 0x800300CC && (read32( (u32)Buffer + i + 8 ) >> 24) == 0x54 )
 				{
 					printpatchfound("VIConfigure", NULL, (u32)Buffer + GotoFuncStart(i, (u32)Buffer));
-					if(ConfigGetVideoScale() != 0)
-					{	//Teconmoon: also set the width of a mode the game builds at run time, at the start of VIConfigure
+					if(ConfigGetVideoScale() != 0 || ConfigGetConfig(NIN_CFG_XFB_SCAN))
+					{	//Teconmoon: at the start of VIConfigure, log the mode the game uses and set the width of a mode built at run time
 						u32 func = (u32)Buffer + GotoFuncStart(i, (u32)Buffer), first = read32(func);
 						if((first & 0xFFFF0000) == 0x94210000 || first == 0x7C0802A6)	//stwu r1,x(r1) or mflr r0
 						{
@@ -2161,16 +2162,23 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 								xorig = (s32)xorig + off < 0 ? 0 : ((s32)xorig + off > 80 ? 80 : (u32)((s32)xorig + off));
 							u32 hook = PatchCopy(VIWidthHook, VIWidthHook_size);
 							write32(hook, first);
-							write32(hook + 10 * 4, 0x38800000 | width);	//li r4,width
-							write32(hook + 12 * 4, 0x38800000 | xorig);	//li r4,xorig
+							if(ConfigGetVideoScale() != 0)
+							{
+								write32(hook + 13 * 4, 0x38800000 | width);	//li r4,width
+								write32(hook + 15 * 4, 0x38800000 | xorig);	//li r4,xorig
+							}
+							else
+							{	//no width wanted (only the log): the two stores become nops
+								write32(hook + 14 * 4, 0x60000000);
+								write32(hook + 16 * 4, 0x60000000);
+							}
 							PatchB(hook, func);
 							PatchB(func + 4, hook + VIWidthHook_size - 4);
-							dbgprintf("Patch:[VIConfigure width hook] 0x%08X width %d origin %d\r\n", func, width, xorig);
+							dbgprintf("Patch:[VIConfigure hook] 0x%08X width %d origin %d\r\n", func, ConfigGetVideoScale() != 0 ? width : 0, ConfigGetVideoScale() != 0 ? xorig : 0);
 						}
 						else
-							dbgprintf("Patch:[VIConfigure width hook] skipped, first instruction %08x\r\n", first);
+							dbgprintf("Patch:[VIConfigure hook] skipped, first instruction %08x\r\n", first);
 					}
-					write32( (u32)Buffer + i + 4, 0x5400F0BE | ((read32( (u32)Buffer + i + 4 ) & 0x3E00000) >> 5) );
 					PatchCount |= FPATCH_VIConfigure;
 					i = GotoFuncEnd(i, (u32)Buffer);
 					continue;
@@ -2498,8 +2506,7 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 						else
 							W16((u32)Buffer+i+0xA, xorig + ConfigGetVideoOffset());
 					}
-					if(ConfigGetConfig(NIN_CFG_FORCE_WIDE))
-					{	//Force Widescreen also fills the height of a letterboxed table
+					{	//fill the height of a letterboxed table, with or without Force Widescreen
 						u16 xfbH = R16((u32)Buffer+i+8), yOrig = R16((u32)Buffer+i+0xC), viH = R16((u32)Buffer+i+0x10);
 						if(NinFillVertical(&xfbH, &yOrig, &viH))
 						{

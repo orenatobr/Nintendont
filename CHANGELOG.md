@@ -7,6 +7,20 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- With XFB Scan on, the VIConfigure hook also leaves the video mode pointer of the game in shared memory and the
+  kernel logs the real mode (`VI mode: ... efb= xfb= xorig= yorig= w= h=`), which shows modes built at run time
+  in any game. The hook is installed when XFB Scan is on even if no width is wanted.
+
+### Changed
+- The vertical fill of letterboxed static tables (448 lines from line 16 to 480 from line 0) no longer needs
+  Force Widescreen; it follows the rule for Sunshine (a full height picture in both modes).
+
+### Changed
+- The Super Mario Sunshine 448 to 480 line patch no longer needs Force Widescreen. Without Force Widescreen the
+  game now also fills the 480 lines (no bars above and below) and keeps its own 4:3 window width, so only
+  bars at the sides remain; with Force Widescreen on the width fills 688 pixels as before.
+
+### Added
 - A hook at the start of the game's `VIConfigure` (`kernel/asm/VIWidthHook.S`, applied in `kernel/Patch.c`; log
   line `Patch:[VIConfigure width hook]`) sets the picture width and origin of a video mode the game builds at
   run time, with the same rule as the static tables (the Video Width in use: the one chosen, or 688 with Force

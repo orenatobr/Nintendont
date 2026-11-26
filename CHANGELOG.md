@@ -7,6 +7,12 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- The mode reference search also looks for accesses through the small data register r13 (`ModeRef13:` lines):
+  it finds the value of r13 where the game sets it (`lis r13` plus `addi` or `ori`) and lists the instructions
+  that use r13 with an offset inside the video mode. The first search of Tales of Symphonia
+  (6.510-fork.13) found 0 references through `lis`, which points to a global reached as `offset(r13)`.
+
+### Added
 - With XFB Scan on, when the kernel sees a new 640 pixel video mode, it searches the game code for the
   instructions that reach that mode (`lis rD,hi(mode)` followed by a load, store or add with that base register
   and an offset inside the mode) and logs them (`ModeRef:` lines), to find the code that fills a mode. The

@@ -1814,6 +1814,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 	u32 cheatsWanted = 0, debuggerWanted = 0;
 	if(ConfigGetConfig(NIN_CFG_CHEATS))
 		cheatsWanted = 1;
+	else if(strcmp(ConfigGetGamePath(), "di") == 0 && Check_Cheats() == 0)
+	{	//Teconmoon: a Wii U (WUP) game cannot tick Cheats, so a /codes/<game id>.gct on the card is enough
+		dbgprintf("Patch:Cheats on for a Wii U disc game, found %s\r\n", cheatPath);
+		cheatsWanted = 1;
+	}
 	if(!IsWiiU() && ConfigGetConfig(NIN_CFG_DEBUGGER))
 		debuggerWanted = 1;
 	if(cheatsWanted || debuggerWanted)
@@ -1837,6 +1842,9 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		PatchCount &= ~(FPATCH_VideoModes | FPATCH_VIConfigure | FPATCH_getTiming);
 		videoPatches = 1;
 	}
+	//Teconmoon: log what the video options came to, the picture (bars, blur, 50 or 60 Hz) depends on it
+	dbgprintf("Video: Force Progressive=%d, video mode word=%08x, game video patches=%d\r\n",
+		ConfigGetConfig(NIN_CFG_FORCE_PROG) != 0, ConfigGetVideoMode(), videoPatches);
 
 	if(ConfigGetConfig(NIN_CFG_BBA_EMU))
 	{
@@ -2318,6 +2326,8 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 					&& (read32((u32)Buffer+i+12) & 0xFF00FF00) == 0x00000200 && read32((u32)Buffer+i+24) == 0x00000606
 					&& read32((u32)Buffer+i+32) == 0x06060606 && read32((u32)Buffer+i+44) == 0x06060606)
 				{
+					//Teconmoon: log the game's video mode table as found (mode, fbWidth, efbHeight, xfbHeight, viXOrigin, viYOrigin, viWidth, viHeight)
+					dbgprintf("Patch:VI table 0x%08X before: mode=%02X fb=%d efb=%d xfb=%d xorig=%d yorig=%d w=%d h=%d\r\n", (u32)Buffer+i, read32((u32)Buffer+i), R16((u32)Buffer+i+4), R16((u32)Buffer+i+6), R16((u32)Buffer+i+8), R16((u32)Buffer+i+0xA), R16((u32)Buffer+i+0xC), R16((u32)Buffer+i+0xE), R16((u32)Buffer+i+0x10));
 					if(ConfigGetVideoMode() & NIN_VID_FORCE)
 					{
 						if(ConfigGetVideoMode() & NIN_VID_FORCE_DF)
@@ -2446,6 +2456,7 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 						else
 							W16((u32)Buffer+i+0xA, xorig + ConfigGetVideoOffset());
 					}
+					dbgprintf("Patch:VI table 0x%08X after:  mode=%02X xorig=%d w=%d (video width option %d, offset %d)\r\n", (u32)Buffer+i, read32((u32)Buffer+i), R16((u32)Buffer+i+0xA), R16((u32)Buffer+i+0xE), ConfigGetVideoScale(), ConfigGetVideoOffset());
 					i += 0x3C;
 					continue;
 				}

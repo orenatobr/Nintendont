@@ -323,12 +323,25 @@ int _main( int argc, char *argv[] )
 	if (IsWiiU())
 	{
 		ori_widesetting = read32(0xd8006a0);
+		//Teconmoon: log what is decided, the DMCU registers also matter to plugins that patch the GamePad display
+		dbgprintf("WiiU aspect: console 16:9=%d, Wii U Widescreen option=%d, DMCU register 0xd8006a0=%08x, config=%08x\r\n",
+			isWidescreen, ConfigGetConfig(NIN_CFG_WIIU_WIDE) != 0, ori_widesetting, ncfg->Config);
 		// Widescreen setting enabled and consoles aspect ratio set to 4:3
 		if (ConfigGetConfig(NIN_CFG_WIIU_WIDE) && !isWidescreen)
+		{
+			dbgprintf("WiiU aspect: writing 0xd8006a0=30000004 (16:9)\r\n");
 			write32(0xd8006a0, 0x30000004), mask32(0xd8006a8, 0, 2);
+		}
 		// Widescreen setting disabled and consoles aspect ratio set to 16:9
 		else if (!ConfigGetConfig(NIN_CFG_WIIU_WIDE) && isWidescreen)
+		{
+			dbgprintf("WiiU aspect: writing 0xd8006a0=30000002 (4:3)\r\n");
 			write32(0xd8006a0, 0x30000002), mask32(0xd8006a8, 0, 2);
+		}
+		else
+		{
+			dbgprintf("WiiU aspect: no DMCU write\r\n");
+		}
 	}
 
 	while (1)

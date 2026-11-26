@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "PatchCodes.h"
 #include "PatchWidescreen.h"
 #include "asm/VIWidthHook.h"
+#include "asm/VIAdjustHook.h"
+#include "../common/include/AdjustOverscan.h"
 #include "../common/include/Sunshine480.h"
 #include "../common/include/LetterboxTables.h"
 #include "PatchTimers.h"
@@ -1915,6 +1917,33 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		u32 tables = NinPatchLetterboxTables((volatile unsigned*)Buffer, Length / 4);
 		if(tables)
 			dbgprintf("Patch:[448 line tables] %d table(s) changed to 480 lines in 0x%08X\r\n", tables, (u32)Buffer);
+	}
+	{	//Teconmoon: GXAdjustForOverscan(rmin, rmout, hor, ver) with ver 16 makes a 448 line letterbox mode out of a 480 line one
+		unsigned starts[4], i, n = NinFindOverscanFuncs((volatile unsigned*)Buffer, Length / 4, starts, 4, 7);
+		dbgprintf("Patch:[GXAdjustForOverscan] %d candidate(s) in 0x%08X\r\n", n, (u32)Buffer);
+		if(n == 1)
+		{
+			u32 func = (u32)Buffer + starts[0] * 4, first = read32(func), op = first >> 26;
+			if(op != 18 && op != 16 && op != 19)	//not a branch: it can be copied into the hook
+			{
+				u32 hook = PatchCopy(VIAdjustHook, VIAdjustHook_size);
+				write32(hook, first);
+				PatchB(hook, func);
+				PatchB(func + 4, hook + VIAdjustHook_size - 4);
+				dbgprintf("Patch:[GXAdjustForOverscan] 0x%08X ver is 0 now\r\n", func);
+			}
+			else
+				dbgprintf("Patch:[GXAdjustForOverscan] 0x%08X starts with a branch, skipped\r\n", func);
+		}
+		else
+		{	//no single match: list the near misses (5 of the 7 fields) so the shape can be corrected from the log
+			n = NinFindOverscanFuncs((volatile unsigned*)Buffer, Length / 4, starts, 4, 5);
+			for(i = 0; i < n && i < 4; i++)
+			{
+				u32 f = (u32)Buffer + starts[i] * 4;
+				dbgprintf("Patch:[GXAdjustForOverscan] near miss 0x%08X: %08X %08X %08X %08X\r\n", f, read32(f), read32(f + 4), read32(f + 8), read32(f + 12));
+			}
+		}
 	}
 
 	if(ConfigGetConfig(NIN_CFG_BBA_EMU))

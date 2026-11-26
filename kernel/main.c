@@ -81,6 +81,35 @@ bool isWidescreen = false;
 #define NIN_XFB_SCAN_MEM	(0x13003F00)
 #define NIN_XFB_W		(640)
 #define NIN_XFB_H		(480)
+extern u32 XfbScanBase, XfbScanLen;
+/*
+ * Who touches a video mode in memory: looks in the game code for `lis rD,hi(mode)` followed within 12 words by an
+ * instruction whose base register is rD and whose offset is in the mode (the mode address + 0 to 0x3F), which is
+ * how the code that fills the mode reaches it (sth rS,6|8|0x10(rD) etc.). Logs up to 24 of them.
+ */
+static void XfbLogModeRefs(u32 ptr)
+{
+	u32 lo = ptr & 0xFFFF, hi = (((ptr >> 16) + ((lo & 0x8000) ? 1 : 0)) & 0xFFFF), a, k, hits = 0, end = XfbScanBase + XfbScanLen;
+	for(a = XfbScanBase; a + 52 < end && hits < 24; a += 4)
+	{
+		u32 w = read32(a);
+		if((w & 0xFC1F0000) != 0x3C000000 || (w & 0xFFFF) != hi)
+			continue;
+		u32 rD = (w >> 21) & 31;
+		for(k = 1; k <= 12; k++)
+		{
+			u32 x = read32(a + 4 * k), off = x & 0xFFFF, op = x >> 26;
+			if(((x >> 16) & 31) == rD && (op == 44 || op == 36 || op == 14 || op == 38 || op == 40 || op == 32) && off >= lo && off < lo + 0x40)
+			{
+				dbgprintf("ModeRef: 0x%08X: lis %08X ... [0x%08X] %08X | %08X %08X %08X %08X %08X %08X\r\n", a, w, a + 4 * k, x,
+					read32(a + 4 * k - 8), read32(a + 4 * k - 4), read32(a + 4 * k + 4), read32(a + 4 * k + 8), read32(a + 4 * k + 12), read32(a + 4 * k + 16));
+				hits++;
+			}
+		}
+	}
+	dbgprintf("ModeRef: %d reference(s) to 0x%08X in 0x%08X, length 0x%X\r\n", hits, ptr, XfbScanBase, XfbScanLen);
+}
+
 /* the video mode the game passes to VIConfigure, left by the hook at 0x13003F20 (see VIWidthHook.S) */
 static void XfbLogViMode(void)
 {
@@ -97,6 +126,8 @@ static void XfbLogViMode(void)
 		return;
 	lastPtr = ptr;
 	lastSum = sum;
+	if(read16(p + 4) == 640 && XfbScanLen != 0)
+		XfbLogModeRefs(ptr);
 	dbgprintf("VI mode: 0x%08X tv=%08x fb=%d efb=%d xfb=%d xorig=%d yorig=%d w=%d h=%d xfbmode=%d\r\n", ptr, read32(p),
 		read16(p + 4), read16(p + 6), read16(p + 8), read16(p + 0xA), read16(p + 0xC), read16(p + 0xE), read16(p + 0x10), read32(p + 0x14));
 }

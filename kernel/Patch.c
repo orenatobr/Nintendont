@@ -1317,6 +1317,7 @@ static bool fileExist(const char *path)
 	return false;
 }
 
+u32 XfbScanBase = 0, XfbScanLen = 0;	//Teconmoon: the game code that XFB Scan may search (the biggest DOL buffer seen)
 void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 {
 	if( (u32)Buffer == 0x01200000 && *(u8*)Buffer == 0x7C )
@@ -1851,6 +1852,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 	if(ConfigGetConfig(NIN_CFG_XFB_SCAN))
 	{	//Teconmoon: with XFB Scan on, list where the game loads 448 (li rD,448): a game with a 448 line video mode builds it there
 		u32 j, hits = 0;
+		if(Length > XfbScanLen)
+		{
+			XfbScanBase = (u32)Buffer;
+			XfbScanLen = Length;
+		}
 		for(j = 8; j + 16 <= Length && hits < 60; j += 4)
 		{
 			if((read32((u32)Buffer + j) & 0xFC1FFFFF) == 0x380001C0)

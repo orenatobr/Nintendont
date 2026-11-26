@@ -15,6 +15,7 @@
  *
  *   VideoScale      = 40 to 120             horizontal size of the picture: 640 + the value - 40 pixels of the 720 wide signal (Teconmoon key; the menu's Video Width)
  *   VideoOffset     = -20 to 20             moves the picture left (negative) or right (Teconmoon key; the menu's Video Offset)
+ *   XfbScan         = True or False         the experimental XFB Scan: logs the black bars of the picture to ndebug.log (Teconmoon key)
  *
  * ProgressiveScan = True, PatchPAL50 = True and a forced VideoMode other than Auto also switch off the PAL guard of this loader for that
  * game: it is the user's choice. VideoMode = PAL50 keeps a PAL game at 50 Hz, so with Deflicker = False it only turns the filter off.
@@ -30,6 +31,7 @@ enum GameSetting
 	GS_DEFLICKER,
 	GS_VIDEO_SCALE,		/* 40 to 120 as is */
 	GS_VIDEO_OFFSET,	/* -20 to 20, stored as the value + 64 */
+	GS_XFB_SCAN,		/* True or False: the experimental XFB Scan (bar detection log) */
 	GS_COUNT
 };
 

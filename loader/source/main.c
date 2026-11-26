@@ -633,6 +633,14 @@ static void ApplyGameSettings(void)
 		ncfg->VideoOffset = set[GS_VIDEO_OFFSET] - 64;
 		gprintf("Game settings: Video offset %d\r\n", set[GS_VIDEO_OFFSET] - 64);
 	}
+	if (set[GS_XFB_SCAN] >= 0)
+	{
+		if (set[GS_XFB_SCAN])
+			ncfg->Config |= NIN_CFG_XFB_SCAN;
+		else
+			ncfg->Config &= ~NIN_CFG_XFB_SCAN;
+		gprintf("Game settings: XFB Scan %s\r\n", set[GS_XFB_SCAN] ? "on" : "off");
+	}
 	gsKeepProg = set[GS_FORCE_PROG] == 1;
 	gsKeepPal50 = set[GS_PATCH_PAL50] == 1;
 	gsKeepVideo = set[GS_VIDEO_MODE] > 0;

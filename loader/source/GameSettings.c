@@ -72,6 +72,8 @@ int GameSettingsParse(char *text, signed char out[GS_COUNT])
 			which = GS_VIDEO_SCALE, v = Num(val, 40, 120, 0);
 		else if (!strcasecmp(key, "VideoOffset"))
 			which = GS_VIDEO_OFFSET, v = Num(val, -20, 20, 64);
+		else if (!strcasecmp(key, "XfbScan"))
+			which = GS_XFB_SCAN, v = Bool(val);
 		else if (!strcasecmp(key, "VideoMode"))
 		{
 			which = GS_VIDEO_MODE;

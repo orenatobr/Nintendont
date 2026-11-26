@@ -1,3 +1,29 @@
+### Nintendont (orenatobr fork)
+
+This is a fork of [FIX94/Nintendont](https://github.com/FIX94/Nintendont), not the original project. It follows
+upstream commit `7a18345` and adds changes for the Wii U (vWii). Everything not listed here works as upstream
+describes below. The full list, release by release, is in [CHANGELOG.md](CHANGELOG.md). Report problems with
+this fork in this repository, not to the upstream authors.
+
+#### What this fork changes
+* **Force Widescreen fills the screen.** With Force Widescreen on and no Video Width chosen, the picture is
+  688 pixels wide, centered, instead of the game's 640. A Video Width you set always wins. With Force Widescreen
+  off the game keeps its own 4:3 window. The video hardware cannot stretch vertically, so black bars drawn inside
+  a game's own picture (for example with a widescreen Gecko code) are not removed by this.
+* **Settings for one game.** `/teconmoon/<id4>.ini` on the card holds a few keys of Dolphin's GameINI format:
+  `AspectRatio`, `wideScreenHack` (Force Widescreen), `ProgressiveScan`, `SkipIPL`, `PatchPAL50`, `VideoMode`,
+  `Deflicker`, `VideoScale` and `VideoOffset`. The full description is in `loader/source/GameSettings.h`.
+* **PAL discs stay at 50 Hz** unless the game's own settings say otherwise, because 60 Hz delays the audio.
+* **Cheats for games started from a WUP.** A `/codes/<game id>.gct` file on the card is loaded without ticking Cheats.
+* **Black video switch.** The loader keeps the screen black while it changes video mode.
+* **Video diagnostics.** `ndebug.log` lists each video mode table of the game, before and after patching.
+
+The default branch is `main`. It is protected: changes go through a pull request that needs one approval.
+`scripts/build_docker.sh` builds `loader/loader.dol` with the pinned toolchain inside Docker, and
+`scripts/test_video_fill.sh` runs the host test of the Force Widescreen width rule.
+
+None of the Wii U changes above were run on a Wii. Check the release notes for what was tried on a console.
+
 ### Nintendont
 A Wii Homebrew Project to play GC Games on Wii and vWii on Wii U
 

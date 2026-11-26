@@ -187,4 +187,18 @@ enum BI2region_codes
 	BI2_REGION_SOUTH_KOREA	= 4,
 };
 
+/*
+ * Video width option in use (the menu's Video Width, 40 to 120 = 640 + value - 40 pixels, 0 = auto).
+ * A width the user chose always wins. Without one, Force Widescreen fills the screen: 600 + 88 = 688 pixels,
+ * the widest picture that still starts on the Wii U (720 pixels gave a black screen on Super Mario Sunshine).
+ * Without Force Widescreen the game keeps its own 4:3 window.
+ */
+#define NIN_FILL_VIDEO_SCALE (88)
+static inline signed char NinEffectiveVideoScale(const NIN_CFG *cfg)
+{
+	if(cfg->VideoScale >= 40 && cfg->VideoScale <= 120)
+		return cfg->VideoScale;
+	return (cfg->Config & NIN_CFG_FORCE_WIDE) ? NIN_FILL_VIDEO_SCALE : 0;
+}
+
 #endif

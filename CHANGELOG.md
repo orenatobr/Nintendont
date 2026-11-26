@@ -7,6 +7,14 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- A hook at the start of the game's `VIConfigure` (`kernel/asm/VIWidthHook.S`, applied in `kernel/Patch.c`; log
+  line `Patch:[VIConfigure width hook]`) sets the picture width and origin of a video mode the game builds at
+  run time, with the same rule as the static tables (the Video Width in use: the one chosen, or 688 with Force
+  Widescreen on, and the Video Offset). Found by the console log of fork.7: Super Mario Sunshine output width
+  came out near 658 pixels (`HSR=0x10f9`), not the 688 the tables set, so thin side bars stayed. Only the video
+  output reads those two fields. Experimental, not tried on a console.
+
+### Added
 - Super Mario Sunshine, Force Widescreen on: the 448 line video mode is changed to 480 lines (`NinPatch448Lines` in
   `common/include/Sunshine480.h`, applied in `kernel/Patch.c`; log line `Patch:[Sunshine 480 lines] N site(s)`).
   It changes the 448 in the game's width/height getter functions and in its NTSC height branches, found by their

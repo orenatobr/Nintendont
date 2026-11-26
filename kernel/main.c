@@ -108,6 +108,43 @@ static void XfbLogModeRefs(u32 ptr)
 		}
 	}
 	dbgprintf("ModeRef: %d reference(s) to 0x%08X in 0x%08X, length 0x%X\r\n", hits, ptr, XfbScanBase, XfbScanLen);
+	{	//the small data register r13: a global reached as offset(r13). Its value is set at the start of the game (lis r13 + addi/ori r13)
+		u32 r13 = 0, n;
+		for(a = XfbScanBase; a < XfbScanBase + 0x2000 && a + 28 < end && !r13; a += 4)
+		{
+			if(read32(a) == 0x3DA00000 + 0 || (read32(a) & 0xFFFF0000) == 0x3DA00000)
+			{
+				for(n = 1; n <= 6; n++)
+				{
+					u32 y = read32(a + 4 * n);
+					if((y & 0xFFFF0000) == 0x39AD0000)
+						r13 = ((read32(a) & 0xFFFF) << 16) + (u32)(s32)(s16)(y & 0xFFFF);
+					else if((y & 0xFFFF0000) == 0x61AD0000)
+						r13 = ((read32(a) & 0xFFFF) << 16) | (y & 0xFFFF);
+					if(r13)
+						break;
+				}
+			}
+		}
+		dbgprintf("ModeRef: r13 = 0x%08X\r\n", r13);
+		if(r13)
+		{
+			s32 lo13 = (s32)ptr - (s32)r13;
+			hits = 0;
+			for(a = XfbScanBase; a + 20 < end && hits < 24; a += 4)
+			{
+				u32 x = read32(a), op = x >> 26;
+				s32 off = (s32)(s16)(x & 0xFFFF);
+				if(((x >> 16) & 31) == 13 && (op == 44 || op == 36 || op == 14 || op == 38 || op == 40 || op == 32) && off >= lo13 && off < lo13 + 0x40)
+				{
+					dbgprintf("ModeRef13: 0x%08X: %08X %08X [%08X] %08X %08X %08X off %d\r\n", a, read32(a - 8), read32(a - 4), x,
+						read32(a + 4), read32(a + 8), read32(a + 12), off - lo13);
+					hits++;
+				}
+			}
+			dbgprintf("ModeRef13: %d reference(s), r13 offset 0x%X\r\n", hits, lo13);
+		}
+	}
 }
 
 /* the video mode the game passes to VIConfigure, left by the hook at 0x13003F20 (see VIWidthHook.S) */

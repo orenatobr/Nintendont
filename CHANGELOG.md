@@ -7,6 +7,13 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- With XFB Scan on, when the kernel sees a new 640 pixel video mode, it searches the game code for the
+  instructions that reach that mode (`lis rD,hi(mode)` followed by a load, store or add with that base register
+  and an offset inside the mode) and logs them (`ModeRef:` lines), to find the code that fills a mode. The
+  Tales of Symphonia log (6.510-fork.12) had no 640 by 448 word and no 448 stored by `sth`, so its 448 line
+  mode at `0x802CAC8C` is computed.
+
+### Added
 - With XFB Scan on, the kernel also lists every word that is `fbWidth 640, efbHeight 448` with the words around
   it (`Tmpl448:` lines), to see the real fields of a 448 line mode table whatever they are. The `Mode448:` list of
   Tales of Symphonia (6.510-fork.11) was empty and its mode at `0x2CAC8C` lies inside the data that the game

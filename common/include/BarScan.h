@@ -8,12 +8,13 @@
  * least NIN_BAR_PERCENT percent of its pixels are black, so a little noise does not break a bar.
  * Bars are counted from each edge inwards, in pixels (left, right) and lines (top, bottom).
  * A frame that is black everywhere is reported as all_black, with every bar 0, because it
- * says nothing about bars. Limits: width <= NIN_BAR_MAX_W, height <= NIN_BAR_MAX_H.
+ * says nothing about bars.
+ * The scan starts at the edges and stops at the first row or column that is not black, so it
+ * needs no work buffers and reads little when the bars are thin. It is meant to run in the
+ * PPC hook of the game, where the small stack and the 12 KB of code room do not allow tables.
  */
 #define NIN_BAR_BLACK_Y		(0x18)
 #define NIN_BAR_PERCENT		(98)
-#define NIN_BAR_MAX_W		(720)
-#define NIN_BAR_MAX_H		(576)
 
 typedef struct NinBars
 {
@@ -24,45 +25,50 @@ typedef struct NinBars
 	unsigned char all_black;
 } NinBars;
 
+/* 1 when at least NIN_BAR_PERCENT percent of the width pixels of line y are black */
+static inline int NinRowIsBlack(const unsigned char *xfb, unsigned width, unsigned stride, unsigned y)
+{
+	const unsigned char *row = xfb + y * stride;
+	unsigned x, count = 0;
+	for(x = 0; x < width; x++)
+		if(row[2 * x] <= NIN_BAR_BLACK_Y)
+			count++;
+	return count * 100 >= width * NIN_BAR_PERCENT;
+}
+
+/* 1 when at least NIN_BAR_PERCENT percent of the height pixels of column x are black */
+static inline int NinColIsBlack(const unsigned char *xfb, unsigned height, unsigned stride, unsigned x)
+{
+	unsigned y, count = 0;
+	for(y = 0; y < height; y++)
+		if(xfb[y * stride + 2 * x] <= NIN_BAR_BLACK_Y)
+			count++;
+	return count * 100 >= height * NIN_BAR_PERCENT;
+}
+
 static inline NinBars NinScanBars(const unsigned char *xfb, unsigned width, unsigned height, unsigned stride)
 {
 	NinBars bars = {0, 0, 0, 0, 0};
-	static unsigned short rowBlack[NIN_BAR_MAX_H];	/* static: the kernel stack is small, not reentrant */
-	static unsigned short colBlack[NIN_BAR_MAX_W];
-	unsigned x, y;
-	if(width == 0 || height == 0 || width > NIN_BAR_MAX_W || height > NIN_BAR_MAX_H)
+	unsigned n;
+	if(width == 0 || height == 0)
 		return bars;
-	for(x = 0; x < width; x++)
-		colBlack[x] = 0;
-	for(y = 0; y < height; y++)
+	for(n = 0; n < height && NinRowIsBlack(xfb, width, stride, n); n++)
+		;
+	if(n == height)
 	{
-		const unsigned char *row = xfb + y * stride;
-		unsigned count = 0;
-		for(x = 0; x < width; x++)
-		{
-			if(row[2 * x] <= NIN_BAR_BLACK_Y)
-			{
-				count++;
-				colBlack[x]++;
-			}
-		}
-		rowBlack[y] = (unsigned short)count;
-	}
-	/* a row is in a bar when rowBlack * 100 >= width * PERCENT, a column when colBlack * 100 >= height * PERCENT */
-	for(y = 0; y < height && (unsigned)rowBlack[y] * 100 >= width * NIN_BAR_PERCENT; y++)
-		bars.top++;
-	if(bars.top == height)
-	{
-		bars.top = 0;
 		bars.all_black = 1;
 		return bars;
 	}
-	for(y = height; y > 0 && (unsigned)rowBlack[y - 1] * 100 >= width * NIN_BAR_PERCENT; y--)
-		bars.bottom++;
-	for(x = 0; x < width && (unsigned)colBlack[x] * 100 >= height * NIN_BAR_PERCENT; x++)
-		bars.left++;
-	for(x = width; x > 0 && (unsigned)colBlack[x - 1] * 100 >= height * NIN_BAR_PERCENT; x--)
-		bars.right++;
+	bars.top = (unsigned short)n;
+	for(n = 0; n < height && NinRowIsBlack(xfb, width, stride, height - 1 - n); n++)
+		;
+	bars.bottom = (unsigned short)n;
+	for(n = 0; n < width && NinColIsBlack(xfb, height, stride, n); n++)
+		;
+	bars.left = (unsigned short)n;
+	for(n = 0; n < width && NinColIsBlack(xfb, height, stride, width - 1 - n); n++)
+		;
+	bars.right = (unsigned short)n;
 	return bars;
 }
 

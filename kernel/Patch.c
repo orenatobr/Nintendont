@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "elf.h"
 #include "PatchCodes.h"
 #include "PatchWidescreen.h"
+#include "../common/include/Sunshine480.h"
 #include "PatchTimers.h"
 #include "TRI.h"
 #include "Config.h"
@@ -1859,6 +1860,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 			}
 		}
 		dbgprintf("Scan448: %d site(s) in 0x%08X, length 0x%X\r\n", hits, (u32)Buffer, Length);
+	}
+	if(TITLE_ID == 0x474D53 && ConfigGetConfig(NIN_CFG_FORCE_WIDE))
+	{	//Teconmoon: Sunshine builds a 448 line video mode; with Force Widescreen on make it 480 lines (see Sunshine480.h)
+		u32 changed = NinPatch448Lines((volatile unsigned*)Buffer, Length / 4);
+		dbgprintf("Patch:[Sunshine 480 lines] %d site(s) changed in 0x%08X\r\n", changed, (u32)Buffer);
 	}
 
 	if(ConfigGetConfig(NIN_CFG_BBA_EMU))

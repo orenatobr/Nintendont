@@ -6,6 +6,14 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Added
+- Super Mario Sunshine, Force Widescreen on: the 448 line video mode is changed to 480 lines (`NinPatch448Lines` in
+  `common/include/Sunshine480.h`, applied in `kernel/Patch.c`; log line `Patch:[Sunshine 480 lines] N site(s)`).
+  It changes the 448 in the game's width/height getter functions and in its NTSC height branches, found by their
+  exact instruction shape from the `Scan448:` log of the console (17 uses of 448 in the game, 7 match). The other
+  uses are not touched. `scripts/test_sunshine_480.sh` tests the matcher with words from that log. Experimental:
+  not tried on a console, and the game's own viewport may still draw 448 lines.
+
 ### Found
 - First console log of XFB Scan (6.510-fork.5, Super Mario Sunshine): the video registers and the XFB read are
   right, and the game runs a **448 line** video mode (`VTR` active lines `0x1C0`; the XFB has 448 valid lines

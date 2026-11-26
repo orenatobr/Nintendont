@@ -8,8 +8,9 @@ this fork in this repository, not to the upstream authors.
 #### What this fork changes
 * **Force Widescreen fills the screen.** With Force Widescreen on and no Video Width chosen, the picture is
   688 pixels wide, centered, instead of the game's 640. A Video Width you set always wins. With Force Widescreen
-  off the game keeps its own 4:3 window. The video hardware cannot stretch vertically, so black bars drawn inside
-  a game's own picture (for example with a widescreen Gecko code) are not removed by this.
+  off the game keeps its own 4:3 window. A letterboxed video mode table (for example 448 lines from line 16) is
+  also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
+  inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
 * **Settings for one game.** `/teconmoon/<id4>.ini` on the card holds a few keys of Dolphin's GameINI format:
   `AspectRatio`, `wideScreenHack` (Force Widescreen), `ProgressiveScan`, `SkipIPL`, `PatchPAL50`, `VideoMode`,
   `Deflicker`, `VideoScale` and `VideoOffset`. The full description is in `loader/source/GameSettings.h`.

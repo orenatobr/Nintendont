@@ -6,6 +6,21 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.2] - 2026-11-26
+
+### Added
+- Force Widescreen also fills the height of a letterboxed video mode table: a table whose picture is
+  `xfbHeight == viHeight` lines, fewer than 480, starting below line 0 (for example 448 lines from line 16) is
+  changed to 480 lines from line 0 (`NinFillVertical` in `common/include/CommonConfig.h`, applied in
+  `kernel/Patch.c`, logged as `filled vertically` in `ndebug.log`). The game scales its EFB copy by
+  `xfbHeight / efbHeight`, so the picture grows to the full height. Tables that already use 480 lines or more
+  are left alone.
+
+### Known limits
+- Super Mario Sunshine's static tables already use 480 lines, so this rule changes nothing for them. It helps
+  only if the game's table is letterboxed. Bars the game draws inside its own picture are still not removed.
+- Not tried on a console when this entry was written.
+
 ## [6.510-fork.1] - 2026-11-26
 
 ### Added
@@ -34,5 +49,6 @@ All notable changes of this fork are listed here. The fork follows
   static video tables of Super Mario Sunshine already fill all 480 lines (`ndebug.log`, `Patch:VI table`).
 - Not tried on a console when this entry was written.
 
-[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.1...HEAD
+[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.2...HEAD
+[6.510-fork.2]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.1...v6.510-fork.2
 [6.510-fork.1]: https://github.com/orenatobr/Nintendont/releases/tag/v6.510-fork.1

@@ -1845,6 +1845,21 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 	//Teconmoon: log what the video options came to, the picture (bars, blur, 50 or 60 Hz) depends on it
 	dbgprintf("Video: Force Progressive=%d, video mode word=%08x, game video patches=%d\r\n",
 		ConfigGetConfig(NIN_CFG_FORCE_PROG) != 0, ConfigGetVideoMode(), videoPatches);
+	if(ConfigGetConfig(NIN_CFG_XFB_SCAN))
+	{	//Teconmoon: with XFB Scan on, list where the game loads 448 (li rD,448): a game with a 448 line video mode builds it there
+		u32 j, hits = 0;
+		for(j = 8; j + 16 <= Length && hits < 60; j += 4)
+		{
+			if((read32((u32)Buffer + j) & 0xFC1FFFFF) == 0x380001C0)
+			{
+				dbgprintf("Scan448: 0x%08X: %08X %08X [%08X] %08X %08X %08X\r\n", (u32)Buffer + j,
+					read32((u32)Buffer + j - 8), read32((u32)Buffer + j - 4), read32((u32)Buffer + j),
+					read32((u32)Buffer + j + 4), read32((u32)Buffer + j + 8), read32((u32)Buffer + j + 12));
+				hits++;
+			}
+		}
+		dbgprintf("Scan448: %d site(s) in 0x%08X, length 0x%X\r\n", hits, (u32)Buffer, Length);
+	}
 
 	if(ConfigGetConfig(NIN_CFG_BBA_EMU))
 	{

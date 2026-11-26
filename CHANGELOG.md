@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Found
+- First console log of XFB Scan (6.510-fork.5, Super Mario Sunshine): the video registers and the XFB read are
+  right, and the game runs a **448 line** video mode (`VTR` active lines `0x1C0`; the XFB has 448 valid lines
+  and 32 empty ones, `bottom=32`). Its static tables are all 480 lines, so the mode is built at run time. The
+  bars are the 32 missing lines of the 480 line signal; the video interface cannot scale vertically, so the
+  fix has to make the game draw and copy 480 lines.
+
+### Added
+- With XFB Scan on, the kernel lists where a game loads the number 448 (`Scan448:` lines in `ndebug.log`),
+  to find where Super Mario Sunshine builds its 448 line mode. Diagnostic only.
+
 ### Added
 - `NinPlanStretch` (`common/include/StretchPlan.h`) with `scripts/test_stretch_plan.sh`: from the bars found, it
   plans what to show and where. Force Widescreen on cuts every bar and fills the screen (688 px, origin 16);

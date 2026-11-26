@@ -7,6 +7,12 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- With XFB Scan on, the kernel also lists every word that is `fbWidth 640, efbHeight 448` with the words around
+  it (`Tmpl448:` lines), to see the real fields of a 448 line mode table whatever they are. The `Mode448:` list of
+  Tales of Symphonia (6.510-fork.11) was empty and its mode at `0x2CAC8C` lies inside the data that the game
+  file fills, so it is a static table that the `NinPatchLetterboxTables` shape missed.
+
+### Added
 - With XFB Scan on, the kernel also lists the 448s that are stored into the efbHeight, xfbHeight or viHeight
   field of a video mode (`Mode448:` lines: `li rD,448` followed by `sth rD,6|8|0x10(rX)` within 8 words), to find
   the code that builds a run time mode. The console log of Tales of Symphonia (6.510-fork.10) showed its 448

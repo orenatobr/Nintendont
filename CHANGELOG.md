@@ -6,6 +6,24 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.3] - 2026-11-26
+
+### Added
+- Automatic black bar detection, phase 1 of 3. A new setting, **XFB Scan (exp.)** (right column of the settings
+  menu, off by default), makes the kernel look at the picture the game shows every 2 seconds and write the bars
+  it finds to `ndebug.log` (`XFB scan: xfb=... left=.. right=.. top=.. bottom=..`, with the raw video
+  registers). It changes nothing on screen and needs Log on. The detector is `NinScanBars` in
+  `common/include/BarScan.h`, covered by `scripts/test_bar_scan.sh`.
+- The video registers are read at `0x0d002000`, which is an assumption (the Flipper registers as the Starlet
+  sees them). The raw registers are logged so that it can be checked; a line `no usable XFB` means it was wrong.
+
+### Planned (target behavior, from the owner)
+- Force Widescreen on in the game's settings: stretch the picture over the whole screen, horizontally and
+  vertically, using the detected bars (phases 2 and 3).
+- Force Widescreen off: stretch a 4:3 window with no bars above and below, only at the sides.
+- Phase 2 crops side bars and scales through the horizontal scaler of the video interface. Phase 3 changes the
+  EFB copy for top and bottom bars, because the video interface cannot scale vertically.
+
 ## [6.510-fork.2] - 2026-11-26
 
 ### Added
@@ -49,6 +67,7 @@ All notable changes of this fork are listed here. The fork follows
   static video tables of Super Mario Sunshine already fill all 480 lines (`ndebug.log`, `Patch:VI table`).
 - Not tried on a console when this entry was written.
 
-[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.2...HEAD
+[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.3...HEAD
+[6.510-fork.3]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.2...v6.510-fork.3
 [6.510-fork.2]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.1...v6.510-fork.2
 [6.510-fork.1]: https://github.com/orenatobr/Nintendont/releases/tag/v6.510-fork.1

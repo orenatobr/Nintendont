@@ -35,6 +35,10 @@ All notable changes of this fork are listed here. The fork follows
   copy by xfbHeight / efbHeight. Experimental, not tried on a console.
 
 ### Status (2026-11-26)
+- Latest is `v6.510-fork.8`. fork.9 to fork.13 are pre-releases (diagnostics, the Sunshine 4:3 window path and the
+  static letterbox table rule). The 4:3 window (Force Widescreen off) is not tried on a console. Tales of Symphonia
+  is a follow-up with a stopping rule: if the `ModeRef` log does not show the code that builds its 448 line mode,
+  it stays documented and does not block the Sunshine work.
 - Source consulted: the [Dolphin wiki page of Super Mario Sunshine](https://wiki.dolphin-emu.org/index.php?title=Super_Mario_Sunshine)
   (section 2.8) gives the 16:9 Gecko codes, which only change aspect constants and HUD positions. It says nothing
   about the video mode, which is why the cause of the bars was found with the console logs, not from the wiki.

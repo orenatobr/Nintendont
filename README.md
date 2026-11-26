@@ -11,11 +11,14 @@ this fork in this repository, not to the upstream authors.
   off the game keeps its own 4:3 window. A letterboxed video mode table (for example 448 lines from line 16) is
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
-* **Status of the Sunshine bars: fixed and confirmed on a console** (`v6.510-fork.8`, the Latest). Super Mario
-  Sunshine uses all 480 lines and 688 pixels with Force Widescreen on. Other games are not generalized yet:
-  Tales of Symphonia still shows thin horizontal bars. `v6.510-fork.3` and `v6.510-fork.4` crash a Wii U when
-  XFB Scan is on; do not use them. Rule of this fork: a build that touches the PPC hook or the video registers is
-  published as a pre-release until a console run confirms it.
+* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.8`: Super Mario Sunshine fills
+  the whole screen with Force Widescreen on (confirmed by the owner). `v6.510-fork.9` to `v6.510-fork.13` are
+  pre-releases: they add the real video mode log, the 480 line patch for Sunshine without Force Widescreen
+  (the 4:3 window, not tried on a console yet) and diagnostics for Tales of Symphonia, whose thin horizontal bars
+  are not fixed yet. `v6.510-fork.3` and `v6.510-fork.4` crash a Wii U when XFB Scan is on; do not use them.
+  Rule of this fork: a build that touches the PPC hook or the video registers is a pre-release until a console
+  run confirms it. Stopping rule for Tales of Symphonia: if the diagnostic does not show the code that builds
+  its mode, it stays a documented follow-up and does not block the Sunshine work.
 * **Status: the automatic stretch does not exist yet.** What is built is the bar detector (XFB Scan, logging only)
   and the plan for the stretch, tested on a Mac. Nothing in the fork crops or scales a game's picture yet.
 * **Black bar detection (experimental).** The settings menu has XFB Scan (off by default). It logs the black bars

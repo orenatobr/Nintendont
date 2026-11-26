@@ -7,6 +7,9 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Status (2026-11-26)
+- Source consulted: the [Dolphin wiki page of Super Mario Sunshine](https://wiki.dolphin-emu.org/index.php?title=Super_Mario_Sunshine)
+  (section 2.8) gives the 16:9 Gecko codes, which only change aspect constants and HUD positions. It says nothing
+  about the video mode, which is why the cause of the bars was found with the console logs, not from the wiki.
 - Confirmed on a console by the owner with `v6.510-fork.8`: Super Mario Sunshine fills 100% of the screen.
 - Process rule since fork.3 and fork.4 crashed a Wii U: a build that touches the PPC hook or the video registers is
   a pre-release until a console run confirms it, then it becomes Latest. fork.3 and fork.4 are pre-releases now.

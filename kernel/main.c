@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "sock.h"
 #include "GCNCard.h"
 #include "debug.h"
+#include "../common/include/BarScan.h"
 #include "GCAM.h"
 #include "TRI.h"
 #include "Patch.h"
@@ -71,6 +72,39 @@ u32 drcAddressAligned = 0;
 bool isWiiVC = false;
 bool wiiVCInternal = false;
 bool isWidescreen = false;
+/*
+ * Experimental (Config > XFB Scan): looks at the picture the game is showing and logs its black bars.
+ * The Starlet is assumed to see the Flipper video registers at 0x0d002000 (mirror of 0xCC002000); this is
+ * unverified, so the raw registers are logged too. The XFB is read as 640x480 YUY2.
+ */
+#define NIN_VI_BASE		(0x0d002000)
+#define NIN_XFB_W		(640)
+#define NIN_XFB_H		(480)
+static void XfbBarScan(void)
+{
+	static u32 lastBars = 0xFFFFFFFF, quiet = 0;
+	u32 tfbl = read32(NIN_VI_BASE + 0x1C);
+	u32 xfb = tfbl & 0x00FFFFFF;
+	if(tfbl & 0x10000000)
+		xfb <<= 5;
+	if(xfb == 0 || xfb + NIN_XFB_W * 2 * NIN_XFB_H > 0x01800000)
+	{
+		if(quiet++ % 10 == 0)
+			dbgprintf("XFB scan: no usable XFB, TFBL=%08x BFBL=%08x DCR=%04x\r\n", tfbl, read32(NIN_VI_BASE + 0x24), read16(NIN_VI_BASE + 2));
+		return;
+	}
+	sync_before_read_align32((void*)xfb, NIN_XFB_W * 2 * NIN_XFB_H);
+	NinBars b = NinScanBars((const unsigned char*)xfb, NIN_XFB_W, NIN_XFB_H, NIN_XFB_W * 2);
+	u32 key = (b.left << 24) ^ (b.right << 16) ^ (b.top << 8) ^ b.bottom ^ (b.all_black << 31);
+	if(key != lastBars || quiet++ % 10 == 0)
+	{
+		dbgprintf("XFB scan: xfb=%08x left=%d right=%d top=%d bottom=%d all_black=%d (VTR=%04x DCR=%04x TFBL=%08x PICCONF=%04x HSR=%04x)\r\n",
+			xfb, b.left, b.right, b.top, b.bottom, b.all_black,
+			read16(NIN_VI_BASE), read16(NIN_VI_BASE + 2), tfbl, read16(NIN_VI_BASE + 0x48), read16(NIN_VI_BASE + 0x4A));
+		lastBars = key;
+	}
+}
+
 int _main( int argc, char *argv[] )
 {
 	//BSS is in DATA section so IOS doesnt touch it, we need to manually clear it
@@ -273,6 +307,7 @@ int _main( int argc, char *argv[] )
 	u32 DiscChangeTimer = Now;
 	u32 ResetTimer = Now;
 	u32 InterruptTimer = Now;
+	u32 XfbScanTimer = Now;
 #ifdef PERFMON
 	u32 loopCnt = 0;
 	u32 loopPrintTimer = Now;
@@ -356,6 +391,11 @@ int _main( int argc, char *argv[] )
 			loopCnt = 0;
 		}
 #endif
+		if(ConfigGetConfig(NIN_CFG_XFB_SCAN) && TimerDiffTicks(XfbScanTimer) > 3796874) //about every 2 seconds
+		{
+			XfbBarScan();
+			XfbScanTimer = read32(HW_TIMER);
+		}
 		//Does interrupts again if needed
 		if(TimerDiffTicks(InterruptTimer) > 15820) //about 120 times a second
 		{

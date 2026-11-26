@@ -1114,6 +1114,18 @@ static const char *const *GetSettingsDescription(const MenuCtx *ctx)
 				return desc_hybrid_exi;
 			}
 
+			case 10: {
+				static const char *desc_xfb_scan[] = {
+					"Experimental. Looks at the",
+					"picture and writes the black",
+					"bars it finds to ndebug.log",
+					"(needs Log on). Changes",
+					"nothing on screen.",
+					NULL
+				};
+				return desc_xfb_scan;
+			}
+
 			default:
 				break;
 		}
@@ -1170,7 +1182,7 @@ static bool UpdateSettingsMenu(MenuCtx *ctx)
 
 		// Check for wraparound.
 		if ((ctx->settings.settingPart == 0 && ctx->settings.posX >= NIN_SETTINGS_LAST) ||
-		    (ctx->settings.settingPart == 1 && ctx->settings.posX >= 10))
+		    (ctx->settings.settingPart == 1 && ctx->settings.posX >= 11))
 		{
 			ctx->settings.posX = 0;
 			ctx->settings.settingPart ^= 1;
@@ -1197,7 +1209,7 @@ static bool UpdateSettingsMenu(MenuCtx *ctx)
 			if (ctx->settings.settingPart == 0) {
 				ctx->settings.posX = NIN_SETTINGS_LAST - 1;
 			} else {
-				ctx->settings.posX = 9;
+				ctx->settings.posX = 10;
 			}
 		}
 
@@ -1460,6 +1472,12 @@ static bool UpdateSettingsMenu(MenuCtx *ctx)
 					ctx->redraw = true;
 					break;
 
+				case 10:
+					ctx->saveSettings = true;
+					ncfg->Config ^= NIN_CFG_XFB_SCAN;
+					ctx->redraw = true;
+					break;
+
 				default:
 					break;
 			}
@@ -1657,6 +1675,11 @@ static bool UpdateSettingsMenu(MenuCtx *ctx)
 				MENU_POS_X + 320, SettingY(ListLoopIndex),
 				"%-18s:%-4s", "hybrid EXI",
 				(ncfg->Config & NIN_CFG_HYBRID_EXI) ? "On" : "Off");
+		ListLoopIndex++;
+
+		PrintFormat(MENU_SIZE, BLACK, MENU_POS_X + 320, SettingY(ListLoopIndex),
+				"%-18s:%-4s", "XFB Scan (exp.)",
+				(ncfg->Config & NIN_CFG_XFB_SCAN) ? "On" : "Off");
 		ListLoopIndex++;
 
 		// Draw the cursor.

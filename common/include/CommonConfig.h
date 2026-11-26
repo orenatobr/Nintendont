@@ -53,6 +53,7 @@ enum ninconfigbitpos
 	NIN_CFG_BIT_SKIP_IPL	= (18),
 	NIN_CFG_BIT_BBA_EMU		= (19),
 	NIN_CFG_BIT_HYBRID_EXI	= (20),
+	NIN_CFG_BIT_XFB_SCAN	= (21),	// Experimental: log black bars of the picture
 
 	// Internal kernel settings.
 	NIN_CFG_BIT_MC_SLOTB	= (31),	// Slot B image is loaded
@@ -83,6 +84,7 @@ enum ninconfig
 	NIN_CFG_SKIP_IPL	= (1<<NIN_CFG_BIT_SKIP_IPL),
 	NIN_CFG_BBA_EMU		= (1<<NIN_CFG_BIT_BBA_EMU),
 	NIN_CFG_HYBRID_EXI	= (1<<NIN_CFG_BIT_HYBRID_EXI),
+	NIN_CFG_XFB_SCAN	= (1<<NIN_CFG_BIT_XFB_SCAN),
 
 	NIN_CFG_MC_SLOTB	= (1<<NIN_CFG_BIT_MC_SLOTB),
 };

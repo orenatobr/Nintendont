@@ -55,6 +55,10 @@ export PATH=$DEVKITPPC/bin:$DEVKITARM/bin:/opt/devkitpro/tools/bin:$PATH
 cd /src
 make forced > /src/build.log 2>&1 || { tail -30 /src/build.log; exit 1; }
 sha256sum loader/loader.dol
+# proof that the new code is in the build: look for markers in the unpacked ELF files (the DOL embeds a packed kernel)
+for f in $(find . -name '*.elf' -newer /in-container.sh); do
+  printf "marker %s: XFB scan=%s XFB Scan (exp.)=%s\n" "$f" "$(strings -a "$f" | grep -c 'XFB scan:')" "$(strings -a "$f" | grep -c 'XFB Scan (exp.)')"
+done
 EOF
 
 docker run --rm --platform linux/amd64 \

@@ -11,6 +11,9 @@ this fork in this repository, not to the upstream authors.
   off the game keeps its own 4:3 window. A letterboxed video mode table (for example 448 lines from line 16) is
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
+* **Black bar detection (experimental).** The settings menu has XFB Scan (off by default). It logs the black bars
+  of the picture to `ndebug.log`. It is the first step of an automatic stretch: Force Widescreen on fills the
+  whole screen, off keeps a 4:3 window with side bars only. See [CHANGELOG.md](CHANGELOG.md).
 * **Settings for one game.** `/teconmoon/<id4>.ini` on the card holds a few keys of Dolphin's GameINI format:
   `AspectRatio`, `wideScreenHack` (Force Widescreen), `ProgressiveScan`, `SkipIPL`, `PatchPAL50`, `VideoMode`,
   `Deflicker`, `VideoScale` and `VideoOffset`. The full description is in `loader/source/GameSettings.h`.

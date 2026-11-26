@@ -23,6 +23,9 @@ int main(void)
 	/* Force Widescreen on and no width chosen fills the screen: 600 + 88 = 688 pixels */
 	assert(scale_for(0, NIN_CFG_FORCE_WIDE) == NIN_FILL_VIDEO_SCALE);
 	assert(NIN_FILL_VIDEO_SCALE + 600 == 688);
+	/* the 4:3 window: a width of 640 (scale 40) is kept as chosen with Force Widescreen off, and fills nothing more */
+	assert(scale_for(40, 0) == 40);
+	assert(scale_for(40, 0) + 600 == 640);
 	/* a width the user chose always wins, with or without Force Widescreen */
 	assert(scale_for(100, 0) == 100);
 	assert(scale_for(100, NIN_CFG_FORCE_WIDE) == 100);

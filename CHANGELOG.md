@@ -6,6 +6,13 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.4] - 2026-11-26
+
+### Added
+- `XfbScan = True` (or `False`) in a game's `/teconmoon/<id4>.ini` switches the experimental XFB Scan on or
+  off for that game. A game started from a WUP ignores the settings menu, so this is the only way to use the
+  scan there. `scripts/test_gamesettings.sh` covers the parser.
+
 ## [6.510-fork.3] - 2026-11-26
 
 ### Added
@@ -67,7 +74,8 @@ All notable changes of this fork are listed here. The fork follows
   static video tables of Super Mario Sunshine already fill all 480 lines (`ndebug.log`, `Patch:VI table`).
 - Not tried on a console when this entry was written.
 
-[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.3...HEAD
+[Unreleased]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.4...HEAD
+[6.510-fork.4]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.3...v6.510-fork.4
 [6.510-fork.3]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.2...v6.510-fork.3
 [6.510-fork.2]: https://github.com/orenatobr/Nintendont/compare/v6.510-fork.1...v6.510-fork.2
 [6.510-fork.1]: https://github.com/orenatobr/Nintendont/releases/tag/v6.510-fork.1

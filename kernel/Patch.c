@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "PatchWidescreen.h"
 #include "asm/VIWidthHook.h"
 #include "../common/include/Sunshine480.h"
+#include "../common/include/LetterboxTables.h"
 #include "PatchTimers.h"
 #include "TRI.h"
 #include "Config.h"
@@ -1867,6 +1868,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		//The width is what Force Widescreen decides: on fills 688 pixels, off keeps the game's own 4:3 window.
 		u32 changed = NinPatch448Lines((volatile unsigned*)Buffer, Length / 4);
 		dbgprintf("Patch:[Sunshine 480 lines] %d site(s) changed in 0x%08X\r\n", changed, (u32)Buffer);
+	}
+	{	//Teconmoon: 448 line letterbox tables that the table scanner does not recognize (see LetterboxTables.h)
+		u32 tables = NinPatchLetterboxTables((volatile unsigned*)Buffer, Length / 4);
+		if(tables)
+			dbgprintf("Patch:[448 line tables] %d table(s) changed to 480 lines in 0x%08X\r\n", tables, (u32)Buffer);
 	}
 
 	if(ConfigGetConfig(NIN_CFG_BBA_EMU))

@@ -7,6 +7,13 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- With XFB Scan on, the kernel also lists the 448s that are stored into the efbHeight, xfbHeight or viHeight
+  field of a video mode (`Mode448:` lines: `li rD,448` followed by `sth rD,6|8|0x10(rX)` within 8 words), to find
+  the code that builds a run time mode. The console log of Tales of Symphonia (6.510-fork.10) showed its 448
+  line mode in memory the file does not fill (built at run time), a game drawn at 640x448 everywhere, and two
+  XFB buffers exactly 448 lines apart, so the height has to be changed where the mode is built.
+
+### Added
 - 448 line letterbox video tables that the table scanner does not recognize are found by the shape of their
   fields (`NinPatchLetterboxTables`, `common/include/LetterboxTables.h`, `scripts/test_letterbox_tables.sh`) and
   changed to 480 lines, for any game, with or without Force Widescreen (log line `Patch:[448 line tables]`). The

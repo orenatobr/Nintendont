@@ -87,7 +87,7 @@ static inline u32 ConfigGetGameID(void)
 
 static inline s8 ConfigGetVideoScale(void)
 {
-	return ncfg->VideoScale;
+	return NinEffectiveVideoScale(ncfg);
 }
 
 static inline s8 ConfigGetVideoOffset(void)

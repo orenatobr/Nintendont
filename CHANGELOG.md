@@ -6,6 +6,23 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Added
+- `NinPlanStretch` (`common/include/StretchPlan.h`) with `scripts/test_stretch_plan.sh`: from the bars found, it
+  plans what to show and where. Force Widescreen on cuts every bar and fills the screen (688 px, origin 16);
+  off keeps a 4:3 window (bars above and below cut, side bars kept, 640 px at origin 40). Dark scenes and
+  bars that leave less than half of the picture are not trusted. It is not connected to the console yet.
+
+### Status of the stretch (what exists and what does not)
+- Exists: the bar detector, the XFB Scan log (6.510-fork.5, not tried on a console yet), the width rule for
+  Force Widescreen (688 px) and the letterbox table rule (448 to 480 lines), and the stretch plan above (host
+  tests only).
+- Does not exist: the stretch itself. Nothing crops or scales the picture of a game yet, so the black bars of
+  Super Mario Sunshine are still there. Phase 2 (side bars, through the video interface) and phase 3 (top and
+  bottom bars, through the EFB copy) need the XFB Scan log from a console first.
+- The video register layout used by XFB Scan matches libogc `video.c`: base `0xCC002000`, top field base in
+  registers 14 and 15 (bytes `0x1C` and `0x1E`), bit 28 set means the address is stored shifted right by 5,
+  `PICCONF` at `0x48` and `HSR` at `0x4A`.
+
 ## [6.510-fork.5] - 2026-11-26
 
 ### Fixed

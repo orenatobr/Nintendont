@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "elf.h"
 #include "PatchCodes.h"
 #include "PatchWidescreen.h"
+#include "asm/VIWidthHook.h"
 #include "../common/include/Sunshine480.h"
 #include "PatchTimers.h"
 #include "TRI.h"
@@ -2149,6 +2150,26 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 				if( BufAt0 == 0x3C608000 && (BufAt4 & 0xFC1FFFFF) == 0x800300CC && (read32( (u32)Buffer + i + 8 ) >> 24) == 0x54 )
 				{
 					printpatchfound("VIConfigure", NULL, (u32)Buffer + GotoFuncStart(i, (u32)Buffer));
+					if(ConfigGetVideoScale() != 0)
+					{	//Teconmoon: also set the width of a mode the game builds at run time, at the start of VIConfigure
+						u32 func = (u32)Buffer + GotoFuncStart(i, (u32)Buffer), first = read32(func);
+						if((first & 0xFFFF0000) == 0x94210000 || first == 0x7C0802A6)	//stwu r1,x(r1) or mflr r0
+						{
+							u32 width = ConfigGetVideoScale() + 600, xorig = (720 - width) / 2;
+							s32 off = ConfigGetVideoOffset();
+							if(off >= -20 && off <= 20)
+								xorig = (s32)xorig + off < 0 ? 0 : ((s32)xorig + off > 80 ? 80 : (u32)((s32)xorig + off));
+							u32 hook = PatchCopy(VIWidthHook, VIWidthHook_size);
+							write32(hook, first);
+							write32(hook + 10 * 4, 0x38800000 | width);	//li r4,width
+							write32(hook + 12 * 4, 0x38800000 | xorig);	//li r4,xorig
+							PatchB(hook, func);
+							PatchB(func + 4, hook + VIWidthHook_size - 4);
+							dbgprintf("Patch:[VIConfigure width hook] 0x%08X width %d origin %d\r\n", func, width, xorig);
+						}
+						else
+							dbgprintf("Patch:[VIConfigure width hook] skipped, first instruction %08x\r\n", first);
+					}
 					write32( (u32)Buffer + i + 4, 0x5400F0BE | ((read32( (u32)Buffer + i + 4 ) & 0x3E00000) >> 5) );
 					PatchCount |= FPATCH_VIConfigure;
 					i = GotoFuncEnd(i, (u32)Buffer);

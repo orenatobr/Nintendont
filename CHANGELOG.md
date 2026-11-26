@@ -6,6 +6,13 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Status (2026-11-26)
+- Confirmed on a console by the owner with `v6.510-fork.8`: Super Mario Sunshine fills 100% of the screen.
+- Process rule since fork.3 and fork.4 crashed a Wii U: a build that touches the PPC hook or the video registers is
+  a pre-release until a console run confirms it, then it becomes Latest. fork.3 and fork.4 are pre-releases now.
+- Not generalized yet: Tales of Symphonia still has thin horizontal bars. The real video mode of any game can be
+  logged with XFB Scan (`VI mode:` lines, `v6.510-fork.9` pre-release).
+
 ### Added
 - With XFB Scan on, the VIConfigure hook also leaves the video mode pointer of the game in shared memory and the
   kernel logs the real mode (`VI mode: ... efb= xfb= xorig= yorig= w= h=`), which shows modes built at run time

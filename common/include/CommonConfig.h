@@ -201,4 +201,21 @@ static inline signed char NinEffectiveVideoScale(const NIN_CFG *cfg)
 	return (cfg->Config & NIN_CFG_FORCE_WIDE) ? NIN_FILL_VIDEO_SCALE : 0;
 }
 
+/*
+ * Vertical fill for Force Widescreen. A letterboxed video mode table (the picture is xfbHeight == viHeight lines,
+ * fewer than 480, starting at line viYOrigin > 0, for example 448 lines from line 16) is changed to use all 480
+ * lines. The game scales its EFB copy by xfbHeight / efbHeight, so the picture grows to the full height.
+ * Tables that already use 480 lines or more (NTSC 480, PAL 528) and tables with another shape are left alone.
+ * Returns 1 when the values were changed.
+ */
+static inline int NinFillVertical(unsigned short *xfbHeight, unsigned short *viYOrigin, unsigned short *viHeight)
+{
+	if(*viYOrigin == 0 || *viHeight >= 480 || *xfbHeight != *viHeight)
+		return 0;
+	*xfbHeight = 480;
+	*viHeight = 480;
+	*viYOrigin = 0;
+	return 1;
+}
+
 #endif

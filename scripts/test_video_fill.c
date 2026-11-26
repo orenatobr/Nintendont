@@ -35,6 +35,26 @@ int main(void)
 	assert(scale_for(39, NIN_CFG_FORCE_WIDE) == NIN_FILL_VIDEO_SCALE);
 	/* other option bits do not matter */
 	assert(scale_for(0, NIN_CFG_FORCE_PROG) == 0);
+	/* vertical: a letterboxed table (448 lines starting at line 16) is stretched to all 480 lines */
+	{
+		unsigned short xfb = 448, yorig = 16, vh = 448;
+		assert(NinFillVertical(&xfb, &yorig, &vh) == 1);
+		assert(xfb == 480 && yorig == 0 && vh == 480);
+	}
+	/* a table that already uses all 480 lines is left alone */
+	{
+		unsigned short xfb = 480, yorig = 0, vh = 480;
+		assert(NinFillVertical(&xfb, &yorig, &vh) == 0);
+		assert(xfb == 480 && yorig == 0 && vh == 480);
+	}
+	/* PAL 528 lines, tall tables and tables whose xfb differs from the VI height are left alone */
+	{
+		unsigned short xfb = 528, yorig = 23, vh = 528;
+		assert(NinFillVertical(&xfb, &yorig, &vh) == 0);
+		xfb = 240; yorig = 8; vh = 480;
+		assert(NinFillVertical(&xfb, &yorig, &vh) == 0);
+		assert(xfb == 240 && yorig == 8 && vh == 480);
+	}
 	puts("test_video_fill: OK");
 	return 0;
 }

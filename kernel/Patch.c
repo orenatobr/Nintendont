@@ -2456,6 +2456,17 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 						else
 							W16((u32)Buffer+i+0xA, xorig + ConfigGetVideoOffset());
 					}
+					if(ConfigGetConfig(NIN_CFG_FORCE_WIDE))
+					{	//Force Widescreen also fills the height of a letterboxed table
+						u16 xfbH = R16((u32)Buffer+i+8), yOrig = R16((u32)Buffer+i+0xC), viH = R16((u32)Buffer+i+0x10);
+						if(NinFillVertical(&xfbH, &yOrig, &viH))
+						{
+							W16((u32)Buffer+i+8, xfbH);
+							W16((u32)Buffer+i+0xC, yOrig);
+							W16((u32)Buffer+i+0x10, viH);
+							dbgprintf("Patch:VI table 0x%08X filled vertically to %d lines\r\n", (u32)Buffer+i, viH);
+						}
+					}
 					dbgprintf("Patch:VI table 0x%08X after:  mode=%02X xorig=%d w=%d (video width option %d, offset %d)\r\n", (u32)Buffer+i, read32((u32)Buffer+i), R16((u32)Buffer+i+0xA), R16((u32)Buffer+i+0xE), ConfigGetVideoScale(), ConfigGetVideoOffset());
 					i += 0x3C;
 					continue;

@@ -6,6 +6,14 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Added
+- 448 line letterbox video tables that the table scanner does not recognize are found by the shape of their
+  fields (`NinPatchLetterboxTables`, `common/include/LetterboxTables.h`, `scripts/test_letterbox_tables.sh`) and
+  changed to 480 lines, for any game, with or without Force Widescreen (log line `Patch:[448 line tables]`). The
+  console log of Tales of Symphonia showed such a table: `efb=448 xfb=448 yorig=16 h=448` at `0x802CAC8C`, next
+  to four standard 480 line tables that were already handled. efbHeight stays 448, so the game scales its EFB
+  copy by xfbHeight / efbHeight. Experimental, not tried on a console.
+
 ### Status (2026-11-26)
 - Source consulted: the [Dolphin wiki page of Super Mario Sunshine](https://wiki.dolphin-emu.org/index.php?title=Super_Mario_Sunshine)
   (section 2.8) gives the 16:9 Gecko codes, which only change aspect constants and HUD positions. It says nothing

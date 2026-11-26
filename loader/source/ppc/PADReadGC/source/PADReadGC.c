@@ -84,6 +84,30 @@ const s8 DEADZONE = 0x1A;
 	else if(tmp_stick16 < -0x80) tmp_stick8 = -0x80; \
 	else tmp_stick8 = (s8)tmp_stick16;
 
+/*
+ * Experimental XFB Scan (Config > XFB Scan). Only this much runs here, in the game's own context, because the
+ * video registers at 0xCC002000 are valid for the PPC only (the 12 KB of this hook leave no room for more).
+ * About every 2 seconds it leaves the XFB address and the raw registers in shared memory; the kernel does the
+ * measuring and the logging: [0] sequence, [1] XFB address, [2] VTR << 16 | DCR, [3] PICCONF << 16 | HSR,
+ * [4] top field base register.
+ */
+static vu32* const _viReg = (vu32*)0xCC002000;
+static vu32* const XfbScanOut = (vu32*)0xD3003F00;
+static void XfbScanTick(void)
+{
+	static u32 calls = 0;
+	u32 tfbl;
+	if(++calls < 120)
+		return;
+	calls = 0;
+	tfbl = _viReg[0x1C / 4];
+	XfbScanOut[1] = (tfbl & 0x10000000) ? ((tfbl & 0x00FFFFFF) << 5) : (tfbl & 0x00FFFFFF);
+	XfbScanOut[2] = _viReg[0];
+	XfbScanOut[3] = _viReg[0x48 / 4];
+	XfbScanOut[4] = tfbl;
+	XfbScanOut[0]++;
+}
+
 u32 PADRead(u32 calledByGame)
 {
 	// Registers r1,r13-r31 automatically restored if used.
@@ -102,6 +126,9 @@ u32 PADRead(u32 calledByGame)
 	}
 	else //this file is only used for hid in the loader
 		MaxPads = 0;
+
+	if(calledByGame && (((NIN_CFG*)0x93004000)->Config & NIN_CFG_XFB_SCAN))
+		XfbScanTick();
 
 	u32 WiiUGamepadSlot = ((NIN_CFG*)0x93004000)->WiiUGamepadSlot;
 	u32 HIDPad = (*HID_STATUS == 0) ? HID_PAD_NONE : HID_PAD_NOT_SET;

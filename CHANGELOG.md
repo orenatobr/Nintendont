@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.31] - 2026-11-27
 
-Pre-release (Latest is fork.23): an experiment, pass or fail on the green band.
+Pre-release (Latest is fork.23): an experiment, pass or fail on the green band; loader.dol sha256 `323433aa...`).
 
 ### Changed
 - The fork.30 log settled two things: `HW_PPCSPEED` is written with the value it already has (`PPCSPEED: now=0000a9e0 wanted=0000a9e0`), so that hypothesis is dead, and the glitch

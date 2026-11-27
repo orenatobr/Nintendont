@@ -8,13 +8,24 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.21] - 2026-11-27
 
-Latest (loader.dol sha256 `35e2015f...`).
+Latest. Includes the fork.20 fix (Resident Evil 4).
 
 ### Fixed
 - The green block that flashed between two black screens after choosing a game (upstream issue 1301; fork.19 did not remove it,
   a console test showed black, a green block about a tenth of the screen high, black, then the game). After the video mode switch the loader
   turned the video back on for a few frames before the game took over. It now stays black from the mode switch until the game starts.
   The game sets its own video mode, so the loader picture is not needed. Check `scripts/test_xfb_size.sh`. Not yet confirmed on a console.
+
+## [6.510-fork.20] - 2026-11-27
+
+Fixes Resident Evil 4 hanging at start. Not yet confirmed on a console.
+
+### Fixed
+- Resident Evil 4 (USA) hung right after `Jumping to 0x80003100`. Its console log was the first one ever to show
+  `Patch:VI table ... filled vertically to 480 lines`: the vertical fill of letterboxed static tables, which
+  fork.9 made run without Force Widescreen, had never run on a console (Sunshine and Tales of Symphonia do not
+  use it). It changes the xfb height of the table to 480 while the game still draws 448 lines, and the game
+  may size its own frame buffers for 448. The fill only runs again with Force Widescreen on, as in fork.2.
 
 ## [6.510-fork.19] - 2026-11-27
 

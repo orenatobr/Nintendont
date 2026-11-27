@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.26] - 2026-11-27
 
-Pre-release, a diagnostic build with no change of behavior (Latest is fork.23).
+Pre-release, a diagnostic build with no change of behavior (Latest is fork.23; loader.dol sha256 `eaa114bd...`).
 
 ### Changed
 - Every line of `ndebug.log` now starts with the Starlet timer in seconds (`[12.345] Kernel Start`). The green band before a game (upstream issue 1301) survived six

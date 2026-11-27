@@ -6,6 +6,12 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.18] - 2026-11-27
+
+Latest. Confirmed on a Wii U by the owner: the 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`). Not tried
+on this build: Sunshine with Force Widescreen on (the video code is the one of fork.15). It holds everything from
+fork.16 and fork.17 except the 540 pixel window.
+
 ### Fixed
 - Removed the 540 pixel "4:3 window" of fork.16 and fork.17. On a Wii U it left a green screen (the console log of
   the run ends right after `Patch:[VIConfigure hook] ... width 540 origin 90` and `Jumping to 0x8000522C`): the VI
@@ -13,7 +19,7 @@ All notable changes of this fork are listed here. The fork follows
   4:3 window comes from the Wii U Widescreen option turned off (game ini `AspectRatio = 2`): the Wii U then
   centers the 4:3 picture with bars on the sides, and the Sunshine 480 line patch still fills it vertically.
   Without Force Widescreen and without a chosen Video Width the game keeps its own table again. Host test
-  `scripts/test_video_fill.sh`. Not tried on a console.
+  `scripts/test_video_fill.sh`. Confirmed: 4:3 picture on a Wii U with `AspectRatio = 2`.
 - The 4:3 window test still showed the picture over the whole screen on fork.16. The log of that run showed
   `video width option 88` and the `nincfg.bin` on the card holds `VideoScale = 88` (the Video Width of the menu, 688)
   while the game `.ini` has no `VideoScale`, and a chosen

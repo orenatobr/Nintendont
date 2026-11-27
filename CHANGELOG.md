@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.31] - 2026-11-27
+
+Pre-release (Latest is fork.23): an experiment, pass or fail on the green band.
+
+### Changed
+- The fork.30 log settled two things: `HW_PPCSPEED` is written with the value it already has (`PPCSPEED: now=0000a9e0 wanted=0000a9e0`), so that hypothesis is dead, and the glitch
+  does not move with a pause after the first kernel signal, so it comes from before it. `WiiDRC_Init` (libwiidrc) only reads memory of IOS and the VI registers never changed, which leaves what only
+  Nintendont does early on a Virtual Console launch. A Virtual Console (autoboot) launch no longer calls `AUDIO_Init`, `DSP_Init`, `AUDIO_StopDMA` and `AUDIO_RegisterDMACallback` in the loader (`NIN_VC_NO_AUDIO_INIT`):
+  the kernel emulates the audio for the game, and the audio clock change may make a TV on HDMI resync. The fork.30 pause and the `HW_PPCSPEED` skip are removed (the log line stays).
+  `scripts/test_xfb_size.sh` checks it. If the band is gone the audio init was the cause; if the game has no sound, this change is the first suspect. Not a confirmed fix.
+
 ## [6.510-fork.30] - 2026-11-27
 
 Pre-release (Latest is fork.23): an experiment that answers three questions with one console test (loader.dol sha256 `f7a5d185...`). It contains fork.29 (no `HW_PPCSPEED` write on a Virtual Console launch).

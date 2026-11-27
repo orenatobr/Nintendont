@@ -455,9 +455,8 @@ int _main( int argc, char *argv[] )
 			want_ppcspeed = ori_ppcspeed & ~(1<<17);
 			break;
 	}
-	if(!isWiiVC)
-		write32(HW_PPCSPEED, want_ppcspeed);
-	dbgprintf("PPCSPEED: now=%08x wanted=%08x %s\r\n", ori_ppcspeed, want_ppcspeed, isWiiVC ? "skipped on Wii VC" : "written");
+	write32(HW_PPCSPEED, want_ppcspeed);
+	dbgprintf("PPCSPEED: now=%08x wanted=%08x written\r\n", ori_ppcspeed, want_ppcspeed); //fork.30 log: now == wanted on a Wii U VC launch, the write changes nothing
 
 	// Set the Wii U widescreen setting
 	u32 ori_widesetting = 0;

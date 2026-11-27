@@ -200,6 +200,9 @@ enum BI2region_codes
 #define NIN_FILL_VIDEO_SCALE (88)
 static inline signed char NinEffectiveVideoScale(const NIN_CFG *cfg)
 {
+	//Teconmoon: Resident Evil 4 (G4B, any region) hangs at start with any video width but its own (upstream issues 589 and 1176)
+	if((cfg->GameID >> 8) == 0x473442)
+		return 0;
 	if(cfg->VideoScale >= 40 && cfg->VideoScale <= 120)
 		return cfg->VideoScale;
 	return (cfg->Config & NIN_CFG_FORCE_WIDE) ? NIN_FILL_VIDEO_SCALE : 0;

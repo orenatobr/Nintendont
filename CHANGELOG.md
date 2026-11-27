@@ -6,6 +6,14 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.22] - 2026-11-27
+
+### Fixed
+- Resident Evil 4 hung right after `Jumping to 0x80003100` on fork.20 and fork.21 as well (the fork.20 vertical fill was not the cause). The
+  console log shows `video width option 88` and `VIConfigure hook ... width 688` applied to its tables: upstream issues 589 and 1176 say the game
+  hangs at start with any Video Width other than Auto or 640. The video width (menu, game ini, Force Widescreen fill) is now ignored for the
+  game ID `G4B*`, so the game keeps its own 640 pixel tables. Host test `scripts/test_video_fill.sh`. Not yet confirmed on a console.
+
 ## [6.510-fork.21] - 2026-11-27
 
 Latest. Includes the fork.20 fix (Resident Evil 4) (loader.dol sha256 `d2dc4bb0...`).

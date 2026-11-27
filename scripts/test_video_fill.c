@@ -38,6 +38,17 @@ int main(void)
 	assert(scale_for(39, NIN_CFG_FORCE_WIDE) == NIN_FILL_VIDEO_SCALE);
 	/* other option bits do not matter */
 	assert(scale_for(0, NIN_CFG_FORCE_PROG) == 0);
+	/* Wii U Widescreen on, Force Widescreen off: the 4:3 window is 540 of 720 pixels, centered */
+	assert(scale_for(0, NIN_CFG_WIIU_WIDE) == NIN_WINDOW43_VIDEO_SCALE);
+	assert(NIN_WINDOW43_VIDEO_SCALE + 600 == 540);
+	assert((720 - 540) / 2 == 90);
+	assert(NinVideoScaleValid(NIN_WINDOW43_VIDEO_SCALE) && NinVideoScaleValid(40) && NinVideoScaleValid(120));
+	assert(!NinVideoScaleValid(0) && !NinVideoScaleValid(39) && !NinVideoScaleValid(121));
+	/* Force Widescreen and a chosen width still win over the 4:3 window */
+	assert(scale_for(0, NIN_CFG_WIIU_WIDE | NIN_CFG_FORCE_WIDE) == NIN_FILL_VIDEO_SCALE);
+	assert(scale_for(40, NIN_CFG_WIIU_WIDE) == 40);
+	/* the offset limit is 80 for usual widths and the free space for the narrow window */
+	assert(NinMaxXOrigin(640) == 80 && NinMaxXOrigin(688) == 80 && NinMaxXOrigin(540) == 180);
 	/* vertical: a letterboxed table (448 lines starting at line 16) is stretched to all 480 lines */
 	{
 		unsigned short xfb = 448, yorig = 16, vh = 448;

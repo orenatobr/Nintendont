@@ -14,10 +14,10 @@ this fork in this repository, not to the upstream authors.
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
 * **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.18`. Confirmed by the owner on a
-  Wii U: Super Mario Sunshine fills the whole screen with Force Widescreen on (since `fork.8`), Sunshine shows a
-  centered 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`), and Tales of Symphonia fills the whole screen
-  (since `fork.15`, no setting needed). Not tried on a console yet: Sunshine with Force Widescreen on the `fork.18`
-  build, and games other than these two. A game ini can set `VideoScale = 0` (or `Auto`) to undo the Video Width
+  Wii U: Super Mario Sunshine fills the whole screen with Force Widescreen on (since `fork.8`, checked again on
+  `fork.18`), Sunshine shows a centered 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`), and Tales of
+  Symphonia fills the whole screen (since `fork.15`, checked again on `fork.18`, no setting needed). Not tried on
+  a console yet: games other than these two. A game ini can set `VideoScale = 0` (or `Auto`) to undo the Video Width
   saved in the menu. `v6.510-fork.16` and `v6.510-fork.17` are pre-releases with the 540 pixel window (the latter
   gives a green screen with `VideoScale = 0` and Wii U Widescreen on): do not use them. `v6.510-fork.3` and
   `v6.510-fork.4` crash a Wii U when XFB Scan is on; do not use them. Rule of this fork: a build that touches the PPC hook or the

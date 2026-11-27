@@ -8,9 +8,9 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.18] - 2026-11-27
 
-Latest. Confirmed on a Wii U by the owner: the 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`). Not tried
-on this build: Sunshine with Force Widescreen on (the video code is the one of fork.15). It holds everything from
-fork.16 and fork.17 except the 540 pixel window.
+Latest. Confirmed on a Wii U by the owner on this build: Super Mario Sunshine and Tales of Symphonia fill the whole
+screen, and Sunshine shows the 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`). It holds everything from
+fork.16 and fork.17 except the 540 pixel window. Not tried on a console: games other than these two.
 
 ### Fixed
 - Removed the 540 pixel "4:3 window" of fork.16 and fork.17. On a Wii U it left a green screen (the console log of

@@ -69,7 +69,7 @@ int GameSettingsParse(char *text, signed char out[GS_COUNT])
 		else if (!strcasecmp(key, "Deflicker"))
 			which = GS_DEFLICKER, v = Bool(val);
 		else if (!strcasecmp(key, "VideoScale"))
-			which = GS_VIDEO_SCALE, v = Num(val, 40, 120, 0);
+			which = GS_VIDEO_SCALE, v = (!strcmp(val, "0") || !strcasecmp(val, "auto")) ? 0 : Num(val, 40, 120, 0);
 		else if (!strcasecmp(key, "VideoOffset"))
 			which = GS_VIDEO_OFFSET, v = Num(val, -20, 20, 64);
 		else if (!strcasecmp(key, "XfbScan"))

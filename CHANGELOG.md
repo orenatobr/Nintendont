@@ -14,6 +14,13 @@ All notable changes of this fork are listed here. The fork follows
   Force Widescreen (688) and a chosen Video Width (640 to 720) still win. The offset limit follows the width
   (`NinMaxXOrigin`). Host test `scripts/test_video_fill.sh`. A game that draws its own 16:9 picture without Force
   Widescreen would look squeezed; set `VideoScale = 40` for it. Not tried on a console.
+- The 4:3 window test still showed the picture over the whole screen on fork.16. The log of that run showed
+  `video width option 88` and the `nincfg.bin` on the card holds `VideoScale = 88` (the Video Width of the menu, 688)
+  while the game `.ini` has no `VideoScale`, and a chosen
+  width always wins, so the 540 pixel window never applied. A game `.ini` only replaces the keys it has, and
+  `VideoScale` could not say "Auto". Now `VideoScale = 0` (or `Auto`) in the game `.ini` undoes the menu width for
+  that start, so Force Widescreen fills the screen (688) and the 4:3 window is 540 pixels. Host test
+  `scripts/test_gamesettings.sh`.
 
 ## [6.510-fork.15] - 2026-11-27
 

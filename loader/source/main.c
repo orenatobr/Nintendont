@@ -1814,6 +1814,21 @@ int main(int argc, char **argv)
 		DCFlushRange((void*)0x81300000, multidol_ldr_bin_size);
 		ICInvalidateRange((void*)0x81300000, multidol_ldr_bin_size);
 	}
+	//Teconmoon: leave the VI off, the power-on state of a GameCube, so the Wii U shows nothing until the game turns it on. The black mode of
+	//libogc still scans the frame buffer on a Wii U and showed a green block before the game (upstream issue 1301). The state before and after
+	//is left for the kernel log (marker, current frame buffer, TFBL, BFBL, DCR before, DCR after).
+	{
+		vu16 *vi = (vu16*)0xCC002000;
+		vu32 *info = (vu32*)0x93003FC0;
+		info[0] = 0x56494F46; //"VIOF"
+		info[1] = (u32)VIDEO_GetCurrentFramebuffer();
+		info[2] = *(vu32*)0xCC00201C;
+		info[3] = *(vu32*)0xCC002024;
+		info[4] = vi[1];
+		vi[1] &= ~1; //DCR enable bit
+		info[5] = vi[1];
+		DCFlushRange((void*)0x93003FC0, 0x20);
+	}
 	_jmp813();
 
 	//IRQ_Restore(level);

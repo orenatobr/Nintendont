@@ -1632,6 +1632,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 
 	dbgprintf("Patch:Offset:0x%08X EOffset:0x%08X Length:%08X\r\n", Buffer, DOLMaxOff, Length );
 	dbgprintf("Patch:Game ID = %x\r\n", GAME_ID);
+	{	//Teconmoon: what the loader left of the video when it switched the VI off (loader/source/main.c)
+		sync_before_read((void*)0x13003FC0, 0x20);
+		dbgprintf("Loader VI at launch: marker=%08x fb=%08x TFBL=%08x BFBL=%08x DCR before=%04x after=%04x\r\n", read32(0x13003FC0),
+			read32(0x13003FC4), read32(0x13003FC8), read32(0x13003FCC), read32(0x13003FD0), read32(0x13003FD4));
+	}
 
 	/* for proper dol detection in PSO */
 	if(isPSO && (PSOHack & PSO_STATE_SWITCH_START))

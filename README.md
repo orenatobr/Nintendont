@@ -8,14 +8,19 @@ this fork in this repository, not to the upstream authors.
 #### What this fork changes
 * **Force Widescreen fills the screen.** With Force Widescreen on and no Video Width chosen, the picture is
   688 pixels wide, centered, instead of the game's 640. A Video Width you set always wins. With Force Widescreen
-  off the game keeps its own 4:3 window. A letterboxed video mode table (for example 448 lines from line 16) is
+  off, the 4:3 window comes from the Wii U Widescreen option turned off (game ini `AspectRatio = 2`): the Wii U
+  centers a 4:3 picture with bars on the sides. A width under 640 pixels is not possible (the video hardware only
+  scales up; it gave a green screen in `fork.16` and `fork.17`). A letterboxed video mode table (for example 448 lines from line 16) is
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
-* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.15`. Confirmed by the owner on a
-  Wii U: Super Mario Sunshine fills the whole screen with Force Widescreen on (since `fork.8`), and Tales of
-  Symphonia fills the whole screen (since `fork.15`, no setting needed). Not tried on a console yet: Sunshine
-  without Force Widescreen (the 4:3 window) and games other than these two. `v6.510-fork.3` and `v6.510-fork.4`
-  crash a Wii U when XFB Scan is on; do not use them. Rule of this fork: a build that touches the PPC hook or the
+* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.18`. Confirmed by the owner on a
+  Wii U: Super Mario Sunshine fills the whole screen with Force Widescreen on (since `fork.8`), Sunshine shows a
+  centered 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`), and Tales of Symphonia fills the whole screen
+  (since `fork.15`, no setting needed). Not tried on a console yet: Sunshine with Force Widescreen on the `fork.18`
+  build, and games other than these two. A game ini can set `VideoScale = 0` (or `Auto`) to undo the Video Width
+  saved in the menu. `v6.510-fork.16` and `v6.510-fork.17` are pre-releases with the 540 pixel window (the latter
+  gives a green screen with `VideoScale = 0` and Wii U Widescreen on): do not use them. `v6.510-fork.3` and
+  `v6.510-fork.4` crash a Wii U when XFB Scan is on; do not use them. Rule of this fork: a build that touches the PPC hook or the
   video registers is a pre-release until a console run confirms it.
 * **Why the bars appeared.** Sunshine runs a 448 line mode built by its own code; Tales of Symphonia gets its
   448 line mode from the SDK function `GXAdjustForOverscan` with 16 lines taken off. The video interface cannot

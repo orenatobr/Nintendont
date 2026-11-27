@@ -24,10 +24,9 @@ grep -q 'if(argsboot == false)' loader/source/main.c || fail "main.c has no auto
 tr -d '\r' < loader/source/main.c | grep -A1 'if(argsboot == false)$' | grep -q 'ReconfigVideo(rmode)' || fail "ReconfigVideo(rmode) is not guarded by autoboot"
 [ "$(grep -c 'SnapVI(' loader/source/main.c)" = 5 ] || fail "SnapVI is not called at the 4 steps"
 grep -q 'Loader VI step' kernel/Patch.c || fail "the kernel does not log the VI steps"
-# A Wii U Virtual Console launch does not write HW_PPCSPEED (a clock change with the video running); the kernel logs the value it would write.
-grep -q 'if(!isWiiVC)' kernel/main.c || fail "the kernel writes HW_PPCSPEED on a Wii VC launch"
-grep -q 'PPCSPEED: now=' kernel/main.c || fail "the kernel does not log PPCSPEED"
-# fork.30 experiment: a VC launch pauses 8 seconds after the kernel is ready, and the kernel logs when it told the loader.
-grep -q 'NIN_BISECT_PAUSE' loader/source/main.c || fail "the bisect pause is missing"
-grep -q 'Kernel ready, telling the loader' kernel/main.c || fail "the kernel does not log the ready time"
+# HW_PPCSPEED is written again (the fork.30 log showed it changes nothing on a VC launch) and the loader pause of fork.30 is gone.
+! grep -q 'sleep(8)' loader/source/main.c || fail "the bisect pause is still there"
+! grep -q 'skipped on Wii VC' kernel/main.c || fail "the kernel still skips HW_PPCSPEED"
+# A Virtual Console (autoboot) launch does not initialise the audio hardware in the loader.
+tr -d '\r' < loader/source/global.c | grep -B1 -A2 'if(autoboot == false)$' | grep -q 'AUDIO_Init(NULL)' || fail "AUDIO_Init is not guarded by autoboot"
 echo "ok"

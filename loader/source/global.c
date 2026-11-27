@@ -178,10 +178,16 @@ static unsigned int font_ttf_size = 0;
 void Initialise(bool autoboot)
 {
 	int i;
-	AUDIO_Init(NULL);
-	DSP_Init();
-	AUDIO_StopDMA();
-	AUDIO_RegisterDMACallback(NULL);
+	//Teconmoon (NIN_VC_NO_AUDIO_INIT): a Virtual Console (autoboot) launch does not touch the audio hardware here, the kernel emulates it for the game. The audio
+	//init changes the clock of the audio interface, and on a Wii U over HDMI the TV may resync with it: a green band with noise before the game (upstream issue 1301)
+	//that a Wii game that is not Nintendont does not have and that the VI registers did not explain.
+	if(autoboot == false)
+	{
+		AUDIO_Init(NULL);
+		DSP_Init();
+		AUDIO_StopDMA();
+		AUDIO_RegisterDMACallback(NULL);
+	}
 	CheckForGecko();
 	gprintf("GRRLIB_Init = %i\r\n", GRRLIB_Init());
 	unzip_data(font_zip, font_zip_size, &font_ttf, &font_ttf_size);

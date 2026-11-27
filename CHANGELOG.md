@@ -7,6 +7,16 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Added
+- `GXAdjustForOverscan` fix for games that build a 448 line letterbox mode from a 480 line one. The mode of
+  Tales of Symphonia in the console log (`efb=448 xfb=448 yorig=16 h=448` out of 480 line tables, no 448 anywhere
+  in the game) is what the SDK function `GXAdjustForOverscan(rmin, rmout, hor, ver)` gives with `ver = 16`. The
+  kernel finds that function by its shape (`NinFindOverscanFuncs`, `common/include/AdjustOverscan.h`, host test
+  `scripts/test_adjust_overscan.sh`) and a hook (`kernel/asm/VIAdjustHook.S`) sets `ver` to 0, so the mode keeps 480
+  lines and everything built from it stays consistent. Log lines `Patch:[GXAdjustForOverscan]`, with the near
+  misses listed when there is no single match. Applies to every game, with or without Force Widescreen.
+  Experimental, not tried on a console; if the game draws at a fixed 448 lines the bottom may stay black.
+
+### Added
 - The mode reference search also looks for accesses through the small data register r13 (`ModeRef13:` lines):
   it finds the value of r13 where the game sets it (`lis r13` plus `addi` or `ori`) and lists the instructions
   that use r13 with an offset inside the video mode. The first search of Tales of Symphonia

@@ -8,6 +8,8 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.21] - 2026-11-27
 
+Latest (loader.dol sha256 `35e2015f...`).
+
 ### Fixed
 - The green block that flashed between two black screens after choosing a game (upstream issue 1301; fork.19 did not remove it,
   a console test showed black, a green block about a tenth of the screen high, black, then the game). After the video mode switch the loader
@@ -16,7 +18,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.19] - 2026-11-27
 
-Latest. Fixes the green stripe before a game starts (loader.dol sha256 `42d31340...`).
+Fixes the loader frame buffer size for tall video modes (loader.dol sha256 `42d31340...`). It did not remove the green block, see fork.21.
 
 ### Fixed
 - Green stripe at the bottom of the screen right before a game starts (upstream issue 1301, seen on a PAL Wii U with

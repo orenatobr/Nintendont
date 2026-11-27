@@ -6,6 +6,10 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.19] - 2026-11-27
+
+Latest. Fixes the green stripe before a game starts (loader.dol sha256 `42d31340...`).
+
 ### Fixed
 - Green stripe at the bottom of the screen right before a game starts (upstream issue 1301, seen on a PAL Wii U with
   GameCube VC injections). The loader frame buffers were allocated and cleared for the menu video mode only. When the

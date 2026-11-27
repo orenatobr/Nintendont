@@ -112,11 +112,11 @@ int  GRRLIB_Init (void) {
 	VIDEO_Configure(rmode);
 
 	// Get some memory to use for a "double buffered" frame buffer
-	if ( !(xfb[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode))) )  return -1;
-	if ( !(xfb[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode))) )  return -1;
+	if ( !(xfb[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(NIN_XFB_MODE))) )  return -1;
+	if ( !(xfb[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(NIN_XFB_MODE))) )  return -1;
 
-	VIDEO_ClearFrameBuffer(rmode, xfb[0], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer(rmode, xfb[1], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer(NIN_XFB_MODE, xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer(NIN_XFB_MODE, xfb[1], COLOR_BLACK);
 
 	VIDEO_SetNextFramebuffer(xfb[fb]);  // Choose a frame buffer to start with
 

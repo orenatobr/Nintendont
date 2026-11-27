@@ -1632,7 +1632,7 @@ int main(int argc, char **argv)
 		while(!__SYS_SyncSram());
 	}
 	
-	//Teconmoon: stay black while the video mode changes and blank the framebuffer the loader still shows, so no stale lines (the green stripe at the bottom of the screen, upstream issue 1301) are scanned out
+	//Teconmoon: stay black while the video mode changes and blank the whole framebuffer the loader still shows (not only the lines of the menu mode: a taller game mode scans more), so no stale lines (the green stripe at the bottom of the screen, upstream issue 1301) are scanned out
 	VIDEO_SetBlack(TRUE);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
@@ -1641,8 +1641,8 @@ int main(int argc, char **argv)
 		void *cur = VIDEO_GetCurrentFramebuffer();
 		if(cur != NULL)
 		{
-			VIDEO_ClearFrameBuffer(rmode, cur, COLOR_BLACK);
-			DCFlushRange(cur, rmode->fbWidth * rmode->xfbHeight * 2);
+			VIDEO_ClearFrameBuffer(NIN_XFB_MODE, cur, COLOR_BLACK);
+			DCFlushRange(cur, VIDEO_GetFrameBufferSize(NIN_XFB_MODE));
 		}
 	}
 	VIDEO_SetBlack(FALSE);

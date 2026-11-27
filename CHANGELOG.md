@@ -6,6 +6,14 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Fixed
+- Green stripe at the bottom of the screen right before a game starts (upstream issue 1301, seen on a PAL Wii U with
+  GameCube VC injections). The loader frame buffers were allocated and cleared for the menu video mode only. When the
+  game mode is taller (for example the menu runs 480 lines with PAL60 and the game starts in PAL50, 528 lines), the VI
+  scans the extra lines past the cleared area, and zeroed YUV memory is green. The two frame buffers are now sized and
+  cleared for the tallest mode (574 lines), and the buffer shown during the mode switch is cleared in full. Check
+  `scripts/test_xfb_size.sh`. Not yet confirmed on a console.
+
 ## [6.510-fork.18] - 2026-11-27
 
 Latest. Confirmed on a Wii U by the owner on this build: Super Mario Sunshine and Tales of Symphonia fill the whole

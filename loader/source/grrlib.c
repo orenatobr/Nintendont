@@ -43,6 +43,8 @@ THE SOFTWARE.
 
 #define DEFAULT_FIFO_SIZE (256 * 1024) /**< GX fifo buffer size. */
 
+bool nin_keep_black = false; //set by main for an autoboot launch, see GRRLIB_Render
+
 //#define ENABLE_JPEG
 #define ENABLE_TTF
 
@@ -1335,7 +1337,10 @@ void  GRRLIB_Render (void) {
 
 	if (!enable_output) // stfour: this prevent strange behavior on first frame
 	{
-		VIDEO_SetBlack(false);  // Enable video output
+		//Teconmoon (nin_keep_black): a Virtual Console (autoboot) launch draws nothing, and this first VIDEO_SetBlack(false) of GRRLIB_Exit took the VI from 0 to 480
+		//active lines in the middle of the boot: the green band of upstream issue 1301 (VI registers of fork.27, steps 2 and 3). The VI stays black until the game starts.
+		if (!nin_keep_black)
+			VIDEO_SetBlack(false);  // Enable video output
 		enable_output = true;
 	}
 

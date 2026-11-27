@@ -436,21 +436,27 @@ int _main( int argc, char *argv[] )
 
 	//This bit seems to be different on japanese consoles
 	u32 ori_ppcspeed = read32(HW_PPCSPEED);
+	//Teconmoon: the value this write would give, and whether it was written. On a Wii U Virtual Console launch the write is skipped: the PPC clock bit changes
+	//while the video is running, a candidate for the green band before a game (upstream issue 1301) that the VI registers of the loader did not explain.
+	u32 want_ppcspeed;
 	switch (BI2region)
 	{
 		case BI2_REGION_JAPAN:
 		case BI2_REGION_SOUTH_KOREA:
 		default:
 			// JPN games.
-			set32(HW_PPCSPEED, (1<<17));
+			want_ppcspeed = ori_ppcspeed | (1<<17);
 			break;
 
 		case BI2_REGION_USA:
 		case BI2_REGION_PAL:
 			// USA/PAL games.
-			clear32(HW_PPCSPEED, (1<<17));
+			want_ppcspeed = ori_ppcspeed & ~(1<<17);
 			break;
 	}
+	if(!isWiiVC)
+		write32(HW_PPCSPEED, want_ppcspeed);
+	dbgprintf("PPCSPEED: now=%08x wanted=%08x %s\r\n", ori_ppcspeed, want_ppcspeed, isWiiVC ? "skipped on Wii VC" : "written");
 
 	// Set the Wii U widescreen setting
 	u32 ori_widesetting = 0;

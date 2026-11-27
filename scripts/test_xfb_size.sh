@@ -24,4 +24,7 @@ grep -q 'if(argsboot == false)' loader/source/main.c || fail "main.c has no auto
 tr -d '\r' < loader/source/main.c | grep -A1 'if(argsboot == false)$' | grep -q 'ReconfigVideo(rmode)' || fail "ReconfigVideo(rmode) is not guarded by autoboot"
 [ "$(grep -c 'SnapVI(' loader/source/main.c)" = 5 ] || fail "SnapVI is not called at the 4 steps"
 grep -q 'Loader VI step' kernel/Patch.c || fail "the kernel does not log the VI steps"
+# A Wii U Virtual Console launch does not write HW_PPCSPEED (a clock change with the video running); the kernel logs the value it would write.
+grep -q 'if(!isWiiVC)' kernel/main.c || fail "the kernel writes HW_PPCSPEED on a Wii VC launch"
+grep -q 'PPCSPEED: now=' kernel/main.c || fail "the kernel does not log PPCSPEED"
 echo "ok"

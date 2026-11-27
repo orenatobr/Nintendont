@@ -13,7 +13,8 @@
  *   VideoMode       = Auto, PAL50, PAL60, NTSC or MPAL   force that video mode, or leave it to the game (Teconmoon key)
  *   Deflicker       = True or False         with a forced VideoMode: the GX deflicker filter on or off (Teconmoon key)
  *
- *   VideoScale      = 40 to 120             horizontal size of the picture: 640 + the value - 40 pixels of the 720 wide signal (Teconmoon key; the menu's Video Width)
+ *   VideoScale      = 40 to 120 or 0/Auto   horizontal size of the picture: 640 + the value - 40 pixels of the 720 wide signal (Teconmoon key; the menu's Video Width).
+ *                                           0 or Auto undoes a Video Width set in the menu, so Force Widescreen fills the screen and the 4:3 window is 540 pixels
  *   VideoOffset     = -20 to 20             moves the picture left (negative) or right (Teconmoon key; the menu's Video Offset)
  *   XfbScan         = True or False         the experimental XFB Scan: logs the black bars of the picture to ndebug.log (Teconmoon key)
  *
@@ -29,7 +30,7 @@ enum GameSetting
 	GS_PATCH_PAL50,
 	GS_VIDEO_MODE,		/* 0 Auto, 1 PAL50, 2 PAL60, 3 NTSC, 4 MPAL */
 	GS_DEFLICKER,
-	GS_VIDEO_SCALE,		/* 40 to 120 as is */
+	GS_VIDEO_SCALE,		/* 40 to 120 as is, 0 for Auto */
 	GS_VIDEO_OFFSET,	/* -20 to 20, stored as the value + 64 */
 	GS_XFB_SCAN,		/* True or False: the experimental XFB Scan (bar detection log) */
 	GS_COUNT

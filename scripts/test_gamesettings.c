@@ -25,6 +25,12 @@ int main(void)
 	/* the existing keys keep working next to it */
 	assert(parse("wideScreenHack = True\nVideoScale = 88\nXfbScan = 1\n", s) == 3);
 	assert(s[GS_FORCE_WIDE] == 1 && s[GS_VIDEO_SCALE] == 88 && s[GS_XFB_SCAN] == 1);
+	/* VideoScale = 0 or Auto is a mentioned value (0), so it can undo a width set in the menu; 39 and 121 are not */
+	assert(parse("VideoScale = 0\n", s) == 1 && s[GS_VIDEO_SCALE] == 0);
+	assert(parse("VideoScale = Auto\n", s) == 1 && s[GS_VIDEO_SCALE] == 0);
+	assert(parse("VideoScale = 39\n", s) == 0 && s[GS_VIDEO_SCALE] == -1);
+	assert(parse("VideoScale = 121\n", s) == 0 && s[GS_VIDEO_SCALE] == -1);
+	assert(parse("VideoScale = 40\n", s) == 1 && s[GS_VIDEO_SCALE] == 40);
 	puts("test_gamesettings: OK");
 	return 0;
 }

@@ -27,4 +27,7 @@ grep -q 'Loader VI step' kernel/Patch.c || fail "the kernel does not log the VI 
 # A Wii U Virtual Console launch does not write HW_PPCSPEED (a clock change with the video running); the kernel logs the value it would write.
 grep -q 'if(!isWiiVC)' kernel/main.c || fail "the kernel writes HW_PPCSPEED on a Wii VC launch"
 grep -q 'PPCSPEED: now=' kernel/main.c || fail "the kernel does not log PPCSPEED"
+# fork.30 experiment: a VC launch pauses 8 seconds after the kernel is ready, and the kernel logs when it told the loader.
+grep -q 'NIN_BISECT_PAUSE' loader/source/main.c || fail "the bisect pause is missing"
+grep -q 'Kernel ready, telling the loader' kernel/main.c || fail "the kernel does not log the ready time"
 echo "ok"

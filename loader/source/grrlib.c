@@ -233,8 +233,9 @@ void  GRRLIB_Exit (void)
     if (gp_fifo != NULL) {  free(gp_fifo);               gp_fifo = NULL;  }
 
 	// Free up memory allocated for frame buffers & FIFOs
-	if (xfb[0]  != NULL) {  free(MEM_K1_TO_K0(xfb[0]));  xfb[0]  = NULL;  }
-	if (xfb[1]  != NULL) {  free(MEM_K1_TO_K0(xfb[1]));  xfb[1]  = NULL;  }
+	//Teconmoon (NIN_KEEP_XFB): the frame buffers are NOT freed here. The VI keeps scanning them until the game starts (a few seconds while the loader waits
+	//for the kernel), and a freed buffer is reused by the next allocation: zeros (green in YUV) and then data showed as a green band and noise at the bottom
+	//of the screen before the game (upstream issue 1301). The loader is about to leave, so the leak costs nothing.
 	if (gp_fifo != NULL) {  free(gp_fifo);               gp_fifo = NULL;  }
 
 	//VIDEO_SetBlack(TRUE);

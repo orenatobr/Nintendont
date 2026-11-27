@@ -16,6 +16,10 @@ grep -q 'define NIN_XFB_MODE' loader/include/global.h || fail "NIN_XFB_MODE is n
 # The loader leaves the VI off (power-on state) right before it jumps to the game, and passes the state to the kernel log.
 grep -q 'vi\[1\] &= ~1' loader/source/main.c || fail "main.c does not switch the VI off before the jump"
 grep -q 'Loader VI at launch' kernel/Patch.c || fail "the kernel does not log the loader VI state"
-# The VI is parked on a black buffer at the top of MEM1 before the jump: the frame buffer of the loader sits where the game loads its data.
-grep -q 'SYS_SetArena1Hi(black)' loader/source/main.c || fail "main.c does not park the VI on a black buffer"
+# The frame buffers of the loader are not freed by GRRLIB_Exit: the VI keeps scanning them while the loader waits for the kernel, and a freed buffer
+# is reused (zeros, then data) and shows as a green band and noise. Only GRRLIB_ExitLight may free them (2 lines).
+grep -q 'NIN_KEEP_XFB' loader/source/grrlib.c || fail "GRRLIB_Exit frees the frame buffers"
+[ "$(grep -c 'free(MEM_K1_TO_K0(xfb' loader/source/grrlib.c)" = 2 ] || fail "more than the 2 frees of GRRLIB_ExitLight"
+# fork.24 hung the loader: VIDEO_WaitVSync sleeps the thread, and the threads are closed before the jump
+! grep -n 'SYS_SetArena1Hi' loader/source/main.c || fail "main.c parks the VI at the top of MEM1 again"
 echo "ok"

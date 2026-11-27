@@ -1814,20 +1814,6 @@ int main(int argc, char **argv)
 		DCFlushRange((void*)0x81300000, multidol_ldr_bin_size);
 		ICInvalidateRange((void*)0x81300000, multidol_ldr_bin_size);
 	}
-	//Teconmoon: park the VI on a black buffer at the top of MEM1 before the game starts. The frame buffer of the loader lives in the loader heap (for example
-	//0x80343860 in the console log), where the game loads its code and data. The game turns the VI on in its own init while the registers still point there, and a
-	//console video of fork.23 shows the result: a green band (zeroed memory) at the bottom of the screen that turns into noise while the game writes (upstream issue 1301).
-	//The top of MEM1 is outside the loader heap and away from the game code, and a game that allocates its frame buffer there finds it black.
-	{
-		u32 xfbSize = VIDEO_GetFrameBufferSize(NIN_XFB_MODE);
-		void *black = (void*)(((u32)SYS_GetArena1Hi() - xfbSize) & ~31);
-		SYS_SetArena1Hi(black);
-		VIDEO_ClearFrameBuffer(NIN_XFB_MODE, black, 0x10801080); //Y=16, Cb=Cr=128: black
-		DCFlushRange(black, xfbSize);
-		VIDEO_SetNextFramebuffer(black);
-		VIDEO_Flush();
-		VIDEO_WaitVSync();
-	}
 	//Teconmoon: leave the VI off, the power-on state of a GameCube, so the Wii U shows nothing until the game turns it on. The black mode of
 	//libogc still scans the frame buffer on a Wii U and showed a green block before the game (upstream issue 1301). The state before and after
 	//is left for the kernel log (marker, current frame buffer, TFBL, BFBL, DCR before, DCR after).

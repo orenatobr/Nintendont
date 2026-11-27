@@ -62,6 +62,20 @@ int main(void)
 		assert(NinFillVertical(&xfb, &yorig, &vh) == 0);
 		assert(xfb == 240 && yorig == 8 && vh == 480);
 	}
+	/* Resident Evil 4 (G4B, any region) hangs at start with any width but its own (upstream issues 589 and 1176) */
+	{
+		NIN_CFG cfg;
+		memset(&cfg, 0, sizeof(cfg));
+		cfg.GameID = 0x47344245; /* G4BE */
+		cfg.VideoScale = 88;
+		assert(NinEffectiveVideoScale(&cfg) == 0);
+		cfg.Config = NIN_CFG_FORCE_WIDE;
+		assert(NinEffectiveVideoScale(&cfg) == 0);
+		cfg.GameID = 0x47344250; /* G4BP */
+		assert(NinEffectiveVideoScale(&cfg) == 0);
+		cfg.GameID = 0x474D5345; /* GMSE, Sunshine keeps its width */
+		assert(NinEffectiveVideoScale(&cfg) == 88);
+	}
 	puts("test_video_fill: OK");
 	return 0;
 }

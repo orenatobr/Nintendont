@@ -845,6 +845,10 @@ int main(int argc, char **argv)
 
 	gprintf("Nintendont at your service!\r\n%s\r\n", NIN_BUILD_STRING);
 	KernelLoaded = 1;
+	//Teconmoon (NIN_BISECT_PAUSE): an experiment, a Virtual Console launch waits 8 seconds here, with the kernel already running. The green band of upstream issue 1301
+	//moves 8 seconds later in a video if it comes from the loader after this point, and stays where it was if it comes from the kernel or from before.
+	if(isWiiVC && argsboot)
+		sleep(8);
 
 	// Checking for storage devices...
 	if(argsboot == false)

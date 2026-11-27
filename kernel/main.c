@@ -389,6 +389,7 @@ int _main( int argc, char *argv[] )
 //Tell PPC side we are ready!
 	cc_ahbMemFlush(1);
 	mdelay(1000);
+	dbgprintf("Kernel ready, telling the loader\r\n");
 	BootStatus(0xdeadbeef, s_size, s_cnt);
 	mdelay(1000); //wait before hw flag changes
 	dbgprintf("Kernel Start\r\n");

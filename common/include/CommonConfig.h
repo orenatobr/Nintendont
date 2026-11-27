@@ -193,14 +193,31 @@ enum BI2region_codes
  * Video width option in use (the menu's Video Width, 40 to 120 = 640 + value - 40 pixels, 0 = auto).
  * A width the user chose always wins. Without one, Force Widescreen fills the screen: 600 + 88 = 688 pixels,
  * the widest picture that still starts on the Wii U (720 pixels gave a black screen on Super Mario Sunshine).
- * Without Force Widescreen the game keeps its own 4:3 window.
+ * Without Force Widescreen but with Wii U Widescreen on, the output is 16:9 and a 640 pixel picture would be
+ * stretched to almost the whole screen. The 4:3 window is then 540 of the 720 pixels (600 - 60), centered.
+ * With Wii U Widescreen off the game keeps its own table (0 = auto).
  */
 #define NIN_FILL_VIDEO_SCALE (88)
+#define NIN_WINDOW43_VIDEO_SCALE (-60)
 static inline signed char NinEffectiveVideoScale(const NIN_CFG *cfg)
 {
 	if(cfg->VideoScale >= 40 && cfg->VideoScale <= 120)
 		return cfg->VideoScale;
-	return (cfg->Config & NIN_CFG_FORCE_WIDE) ? NIN_FILL_VIDEO_SCALE : 0;
+	if(cfg->Config & NIN_CFG_FORCE_WIDE)
+		return NIN_FILL_VIDEO_SCALE;
+	return (cfg->Config & NIN_CFG_WIIU_WIDE) ? NIN_WINDOW43_VIDEO_SCALE : 0;
+}
+
+/* True for a width value NinEffectiveVideoScale can return (a chosen 40 to 120, or the 4:3 window). */
+static inline int NinVideoScaleValid(signed char scale)
+{
+	return (scale >= 40 && scale <= 120) || scale == NIN_WINDOW43_VIDEO_SCALE;
+}
+
+/* Highest viXOrigin the offset may reach: 80 for the usual widths, centered plus 0 for a narrower picture. */
+static inline unsigned int NinMaxXOrigin(unsigned int width)
+{
+	return width < 640 ? 720 - width : 80;
 }
 
 /*

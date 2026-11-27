@@ -2098,7 +2098,7 @@ static void PrintDevInfo(void)
 void ReconfigVideo(GXRModeObj *vidmode)
 {
 	signed char scale = NinEffectiveVideoScale(ncfg);
-	if(scale >= 40 && scale <= 120)
+	if(NinVideoScaleValid(scale))
 		vidmode->viWidth = scale + 600;
 	else
 		vidmode->viWidth = 640;
@@ -2108,8 +2108,8 @@ void ReconfigVideo(GXRModeObj *vidmode)
 	{
 		if((vidmode->viXOrigin + ncfg->VideoOffset) < 0)
 			vidmode->viXOrigin = 0;
-		else if((vidmode->viXOrigin + ncfg->VideoOffset) > 80)
-			vidmode->viXOrigin = 80;
+		else if((vidmode->viXOrigin + ncfg->VideoOffset) > NinMaxXOrigin(vidmode->viWidth))
+			vidmode->viXOrigin = NinMaxXOrigin(vidmode->viWidth);
 		else
 			vidmode->viXOrigin += ncfg->VideoOffset;
 	}

@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.27] - 2026-11-27
 
-Pre-release, an experiment and a measurement (Latest is fork.23).
+Pre-release, an experiment and a measurement (Latest is fork.23; loader.dol sha256 `5d2022f9...`).
 
 ### Changed
 - Green band before a game (upstream issue 1301), the next step after six refuted guesses. The user reports that Wii games that are not Nintendont do not have it, so the loader

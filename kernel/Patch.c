@@ -1636,6 +1636,12 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		sync_before_read((void*)0x13003FC0, 0x20);
 		dbgprintf("Loader VI at launch: marker=%08x fb=%08x TFBL=%08x BFBL=%08x DCR before=%04x after=%04x\r\n", read32(0x13003FC0),
 			read32(0x13003FC4), read32(0x13003FC8), read32(0x13003FCC), read32(0x13003FD0), read32(0x13003FD4));
+		int snap;
+		sync_before_read((void*)0x13003E00, 0x80);
+		for(snap = 0; snap < 4; snap++)
+			dbgprintf("Loader VI step %d: VTR/DCR=%08x HTR0=%08x HTR1=%08x VTO=%08x VTE=%08x TFBL=%08x HSR=%08x PICCONF=%08x\r\n", snap,
+				read32(0x13003E00 + snap*0x20), read32(0x13003E04 + snap*0x20), read32(0x13003E08 + snap*0x20), read32(0x13003E0C + snap*0x20),
+				read32(0x13003E10 + snap*0x20), read32(0x13003E14 + snap*0x20), read32(0x13003E18 + snap*0x20), read32(0x13003E1C + snap*0x20));
 	}
 
 	/* for proper dol detection in PSO */

@@ -13,9 +13,8 @@ this fork in this repository, not to the upstream authors.
   scales up; it gave a green screen in `fork.16` and `fork.17`). A letterboxed video mode table (for example 448 lines from line 16) is
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
-* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.21` (it keeps the video black from the mode switch until the game starts, to remove the green
-  block that flashed before a game, upstream issue 1301; not yet checked on a console, `v6.510-fork.18` is the last build
-  confirmed there; `fork.19` did not remove the flash). Confirmed by the owner on a
+* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.22` (Resident Evil 4 keeps its own video width; not yet checked on a console, `v6.510-fork.18` is the last build
+  confirmed there; the green flash before a game is still open, `fork.19` and `fork.21` did not remove it). Confirmed by the owner on a
   Wii U: Super Mario Sunshine fills the whole screen with Force Widescreen on (since `fork.8`, checked again on
   `fork.18`), Sunshine shows a centered 4:3 picture with Wii U Widescreen off (`AspectRatio = 2`), and Tales of
   Symphonia fills the whole screen (since `fork.15`, checked again on `fork.18`, no setting needed). Not tried on

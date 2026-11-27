@@ -8,6 +8,8 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.22] - 2026-11-27
 
+Latest (loader.dol sha256 `e8c30e80...`). The green flash before a game is still open (fork.21 did not remove it).
+
 ### Fixed
 - Resident Evil 4 hung right after `Jumping to 0x80003100` on fork.20 and fork.21 as well (the fork.20 vertical fill was not the cause). The
   console log shows `video width option 88` and `VIConfigure hook ... width 688` applied to its tables: upstream issues 589 and 1176 say the game

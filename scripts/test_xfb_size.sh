@@ -22,4 +22,9 @@ grep -q 'NIN_KEEP_XFB' loader/source/grrlib.c || fail "GRRLIB_Exit frees the fra
 [ "$(grep -c 'free(MEM_K1_TO_K0(xfb' loader/source/grrlib.c)" = 2 ] || fail "more than the 2 frees of GRRLIB_ExitLight"
 # fork.24 hung the loader: VIDEO_WaitVSync sleeps the thread, and the threads are closed before the jump
 ! grep -n 'SYS_SetArena1Hi' loader/source/main.c || fail "main.c parks the VI at the top of MEM1 again"
+# A Virtual Console launch (autoboot) must not change the VI width in the menu video setup; the VI registers are logged at 4 steps.
+grep -q 'if(argsboot == false)' loader/source/main.c || fail "main.c has no autoboot guard"
+tr -d '\r' < loader/source/main.c | grep -A1 'if(argsboot == false)$' | grep -q 'ReconfigVideo(rmode)' || fail "ReconfigVideo(rmode) is not guarded by autoboot"
+[ "$(grep -c 'SnapVI(' loader/source/main.c)" = 5 ] || fail "SnapVI is not called at the 4 steps"
+grep -q 'Loader VI step' kernel/Patch.c || fail "the kernel does not log the VI steps"
 echo "ok"

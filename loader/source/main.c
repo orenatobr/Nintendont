@@ -646,8 +646,26 @@ static void ApplyGameSettings(void)
 	gsKeepVideo = set[GS_VIDEO_MODE] > 0;
 }
 
+//Teconmoon: copies the VI registers into shared memory (0x93003E00 + 0x20 per step) for the kernel log: 0 start of main (the state the launcher left),
+//1 after Initialise (GRRLIB_Init), 2 after the menu video setup, 3 before the video mode switch of the launch. A change of the VI timing on a Wii U
+//shows as a green band or a vertical stripe, and Wii games that are not Nintendont do not have it, so the loader must be the one that changes it.
+static void SnapVI(int step)
+{
+	vu32 *snap = (vu32*)(0x93003E00 + step * 0x20);
+	snap[0] = *(vu32*)0xCC002000; //VTR and DCR
+	snap[1] = *(vu32*)0xCC002004; //HTR0
+	snap[2] = *(vu32*)0xCC002008; //HTR1
+	snap[3] = *(vu32*)0xCC00200C; //VTO
+	snap[4] = *(vu32*)0xCC002010; //VTE
+	snap[5] = *(vu32*)0xCC00201C; //TFBL
+	snap[6] = *(vu32*)0xCC002048; //HSR
+	snap[7] = *(vu32*)0xCC00206C; //PICCONF
+	DCFlushRange((void*)snap, 0x20);
+}
+
 int main(int argc, char **argv)
 {
+	SnapVI(0);
 	// Exit after 10 seconds if there is an error
 	__exception_setreload(10);
 //	u64 timeout = 0;
@@ -678,6 +696,7 @@ int main(int argc, char **argv)
 	//STM_RegisterEventHandler(HandleSTMEvent);
 
 	Initialise(argsboot);
+	SnapVI(1);
 
 	//for BT.c
 	CONF_GetPadDevices((conf_pads*)0x932C0000);
@@ -920,7 +939,10 @@ int main(int argc, char **argv)
 			i++;
 		}
 	}
-	ReconfigVideo(rmode);
+	//Teconmoon: a Wii U Virtual Console launch (autoboot) draws nothing, so it must not change the VI width here: the change shows as a vertical stripe
+	if(argsboot == false)
+		ReconfigVideo(rmode);
+	SnapVI(2);
 	UseSD = (ncfg->Config & NIN_CFG_USB) == 0;
 
 	bool progressive = (CONF_GetProgressiveScan() > 0) && VIDEO_HaveComponentCable();
@@ -1632,6 +1654,7 @@ int main(int argc, char **argv)
 		while(!__SYS_SyncSram());
 	}
 	
+	SnapVI(3);
 	//Teconmoon: stay black while the video mode changes and blank the whole framebuffer the loader still shows (not only the lines of the menu mode: a taller game mode scans more), so no stale lines (the green stripe at the bottom of the screen, upstream issue 1301) are scanned out
 	VIDEO_SetBlack(TRUE);
 	VIDEO_Flush();

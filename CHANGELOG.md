@@ -6,6 +6,18 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.27] - 2026-11-27
+
+Pre-release, an experiment and a measurement (Latest is fork.23).
+
+### Changed
+- Green band before a game (upstream issue 1301), the next step after six refuted guesses. The user reports that Wii games that are not Nintendont do not have it, so the loader
+  changes something that they do not, and a second glitch, short and vertical, was seen. A video of a Virtual Console launch places the first one in the loader, before the kernel logs.
+  An autoboot (Virtual Console) launch draws nothing, so it no longer calls `ReconfigVideo(rmode)` in the menu video setup: that call changes the VI width (640 to 688 with a saved Video Width
+  of 88), a candidate for the vertical stripe. The loader also copies the VI registers (VTR, DCR, HTR0, HTR1, VTO, VTE, TFBL, HSR, PICCONF) at four steps (start of main, after `Initialise`,
+  after the menu video setup, before the launch mode switch) and the kernel logs them as `Loader VI step N: ...`, so the next step can see which call changes the VI timing. Check
+  `scripts/test_xfb_size.sh`. Not yet confirmed on a console.
+
 ## [6.510-fork.26] - 2026-11-27
 
 Pre-release, a diagnostic build with no change of behavior (Latest is fork.23; loader.dol sha256 `eaa114bd...`).

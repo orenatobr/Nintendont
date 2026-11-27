@@ -14,7 +14,7 @@
  *   Deflicker       = True or False         with a forced VideoMode: the GX deflicker filter on or off (Teconmoon key)
  *
  *   VideoScale      = 40 to 120 or 0/Auto   horizontal size of the picture: 640 + the value - 40 pixels of the 720 wide signal (Teconmoon key; the menu's Video Width).
- *                                           0 or Auto undoes a Video Width set in the menu, so Force Widescreen fills the screen and the 4:3 window is 540 pixels
+ *                                           0 or Auto undoes a Video Width set in the menu, so Force Widescreen fills the screen (688 pixels) and the game keeps its own 640 pixel table
  *   VideoOffset     = -20 to 20             moves the picture left (negative) or right (Teconmoon key; the menu's Video Offset)
  *   XfbScan         = True or False         the experimental XFB Scan: logs the black bars of the picture to ndebug.log (Teconmoon key)
  *

@@ -40,6 +40,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //#define EXIPATCH
 //#define SCREENSHOT
 
+//Teconmoon: the loader frame buffers are sized and cleared for this tallest mode (PAL, 574 lines), whatever the menu or
+//the game mode is. The VI scans the mode of the game over the same buffers, and a line beyond the cleared area is zeroed
+//YUV memory, which is green (the green stripe at the bottom of the screen, upstream issue 1301).
+#define NIN_XFB_MODE		(&TVPal576IntDfScale)
+
 #define MENU_POS_X			25
 #define MENU_POS_Y			34
 #define DEFAULT_SIZE		16 // At 16, all characters are 10 pixels wide.  Use this to calculate centers

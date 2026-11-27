@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.29] - 2026-11-27
+
+Pre-release (Latest is fork.23): an experiment, with a measurement that settles it.
+
+### Fixed
+- Green band before a game (upstream issue 1301). The fork.28 log shows the VI black from the launcher to the jump (`Loader VI step 3` VTR 000c) and the band still there, so the loader
+  VI registers are not the cause: this removes the unblank theory. The remaining step of the boot that the Wii U can see is the kernel start: after it tells the loader it is ready, waits two seconds and logs
+  `Kernel Start`, the kernel writes hardware registers, among them `HW_PPCSPEED` (the PPC clock bit, set or cleared by the region of the game). On a Wii U Virtual Console launch that write is now skipped, and the kernel
+  logs `PPCSPEED: now=... wanted=... skipped on Wii VC`: if now and wanted are equal the write changed nothing and this hypothesis is dead; if they differ and the band is gone, it is confirmed.
+  `scripts/test_xfb_size.sh` checks it. Not yet confirmed on a console.
+
 ## [6.510-fork.28] - 2026-11-27
 
 Pre-release (Latest is fork.23): the first change aimed at the VI registers that the fork.27 log measured; loader.dol sha256 `e1859ebc...`).

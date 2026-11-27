@@ -10,4 +10,7 @@ fail() { echo "FAIL: $1" >&2; exit 1; }
 grep -q 'NIN_XFB_MODE' loader/source/grrlib.c || fail "grrlib.c does not use NIN_XFB_MODE"
 grep -q 'NIN_XFB_MODE' loader/source/main.c || fail "main.c does not use NIN_XFB_MODE"
 grep -q 'define NIN_XFB_MODE' loader/include/global.h || fail "NIN_XFB_MODE is not defined"
+# The green block that flashed between two black screens when a game was chosen came from the loader turning the
+# video back on for a few frames after the mode switch. The video must stay black until the game takes over.
+! grep -n 'VIDEO_SetBlack(FALSE)' loader/source/main.c || fail "main.c turns the video on during the game launch"
 echo "ok"

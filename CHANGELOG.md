@@ -6,6 +6,16 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.21] - 2026-11-27
+
+Latest. Includes the fork.20 fix (Resident Evil 4) (loader.dol sha256 `d2dc4bb0...`).
+
+### Fixed
+- The green block that flashed between two black screens after choosing a game (upstream issue 1301; fork.19 did not remove it,
+  a console test showed black, a green block about a tenth of the screen high, black, then the game). After the video mode switch the loader
+  turned the video back on for a few frames before the game took over. It now stays black from the mode switch until the game starts.
+  The game sets its own video mode, so the loader picture is not needed. Check `scripts/test_xfb_size.sh`. Not yet confirmed on a console.
+
 ## [6.510-fork.20] - 2026-11-27
 
 Fixes Resident Evil 4 hanging at start. Not yet confirmed on a console.
@@ -19,7 +29,7 @@ Fixes Resident Evil 4 hanging at start. Not yet confirmed on a console.
 
 ## [6.510-fork.19] - 2026-11-27
 
-Latest. Fixes the green stripe before a game starts (loader.dol sha256 `42d31340...`).
+Fixes the loader frame buffer size for tall video modes (loader.dol sha256 `42d31340...`). It did not remove the green block, see fork.21.
 
 ### Fixed
 - Green stripe at the bottom of the screen right before a game starts (upstream issue 1301, seen on a PAL Wii U with

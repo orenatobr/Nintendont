@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.28] - 2026-11-27
+
+Pre-release (Latest is fork.23): the first change aimed at the VI registers that the fork.27 log measured; loader.dol sha256 `e1859ebc...`).
+
+### Fixed
+- Green band before a game (upstream issue 1301), now from data. The fork.27 log of a Virtual Console launch (`Loader VI step 0..3`) shows the launcher leaving the VI black (VTR 000c, 0 active lines), the loader
+  keeping the same timing through `GRRLIB_Init` and the menu setup (steps 1 and 2), and the VI at 480 active lines (VTR 1e0c) by step 3. The only code that unblanks the VI there is the first `GRRLIB_Render`, which on an
+  autoboot launch happens in `GRRLIB_Exit` at the end of the loader, about 15 seconds before the first screen of the game, where the video of the user places the glitch. An autoboot launch now keeps the VI black
+  until the game starts (`nin_keep_black`). fork.23 also switched the VI off before the jump, so the game turned it on again: that switch is removed, because it is a candidate for the short vertical glitch
+  the user saw with fork.26 and fork.27. The VI registers are still logged (step 3 should now show VTR 000c). `scripts/test_xfb_size.sh` checks both. Not yet confirmed on a console.
+
 ## [6.510-fork.27] - 2026-11-27
 
 Pre-release, an experiment and a measurement (Latest is fork.23; loader.dol sha256 `5d2022f9...`).

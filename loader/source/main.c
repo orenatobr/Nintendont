@@ -663,6 +663,8 @@ static void SnapVI(int step)
 	DCFlushRange((void*)snap, 0x20);
 }
 
+extern bool nin_keep_black;
+
 int main(int argc, char **argv)
 {
 	SnapVI(0);
@@ -695,6 +697,7 @@ int main(int argc, char **argv)
 	//Meh, doesnt do anything anymore anyways
 	//STM_RegisterEventHandler(HandleSTMEvent);
 
+	nin_keep_black = argsboot;
 	Initialise(argsboot);
 	SnapVI(1);
 
@@ -1848,7 +1851,6 @@ int main(int argc, char **argv)
 		info[2] = *(vu32*)0xCC00201C;
 		info[3] = *(vu32*)0xCC002024;
 		info[4] = vi[1];
-		vi[1] &= ~1; //DCR enable bit
 		info[5] = vi[1];
 		DCFlushRange((void*)0x93003FC0, 0x20);
 	}

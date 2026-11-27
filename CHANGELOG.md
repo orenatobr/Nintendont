@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.28] - 2026-11-27
 
-Pre-release (Latest is fork.23): the first change aimed at the VI registers that the fork.27 log measured.
+Pre-release (Latest is fork.23): the first change aimed at the VI registers that the fork.27 log measured; loader.dol sha256 `e1859ebc...`).
 
 ### Fixed
 - Green band before a game (upstream issue 1301), now from data. The fork.27 log of a Virtual Console launch (`Loader VI step 0..3`) shows the launcher leaving the VI black (VTR 000c, 0 active lines), the loader

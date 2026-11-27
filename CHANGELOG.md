@@ -7,19 +7,19 @@ All notable changes of this fork are listed here. The fork follows
 ## [Unreleased]
 
 ### Fixed
-- The 4:3 window without Force Widescreen. The owner's test of Super Mario Sunshine with Force Widescreen off and
-  Wii U Widescreen on showed a picture stretched over the whole 16:9 screen (640 of 720 pixels, anamorphic), not a
-  4:3 window. Now, with Wii U Widescreen on, Force Widescreen off and no Video Width chosen, the width is 540 of
-  720 pixels (`NIN_WINDOW43_VIDEO_SCALE`, -60), centered at x origin 90, so the bars are on the sides only.
-  Force Widescreen (688) and a chosen Video Width (640 to 720) still win. The offset limit follows the width
-  (`NinMaxXOrigin`). Host test `scripts/test_video_fill.sh`. A game that draws its own 16:9 picture without Force
-  Widescreen would look squeezed; set `VideoScale = 40` for it. Not tried on a console.
+- Removed the 540 pixel "4:3 window" of fork.16 and fork.17. On a Wii U it left a green screen (the console log of
+  the run ends right after `Patch:[VIConfigure hook] ... width 540 origin 90` and `Jumping to 0x8000522C`): the VI
+  can only scale a picture up, and the game picture is 640 pixels wide, so a 540 pixel picture is not valid. The
+  4:3 window comes from the Wii U Widescreen option turned off (game ini `AspectRatio = 2`): the Wii U then
+  centers the 4:3 picture with bars on the sides, and the Sunshine 480 line patch still fills it vertically.
+  Without Force Widescreen and without a chosen Video Width the game keeps its own table again. Host test
+  `scripts/test_video_fill.sh`. Not tried on a console.
 - The 4:3 window test still showed the picture over the whole screen on fork.16. The log of that run showed
   `video width option 88` and the `nincfg.bin` on the card holds `VideoScale = 88` (the Video Width of the menu, 688)
   while the game `.ini` has no `VideoScale`, and a chosen
   width always wins, so the 540 pixel window never applied. A game `.ini` only replaces the keys it has, and
   `VideoScale` could not say "Auto". Now `VideoScale = 0` (or `Auto`) in the game `.ini` undoes the menu width for
-  that start, so Force Widescreen fills the screen (688) and the 4:3 window is 540 pixels. Host test
+  that start, so Force Widescreen fills the screen (688) and the game keeps its own 640 pixel table. Host test
   `scripts/test_gamesettings.sh`.
 
 ## [6.510-fork.15] - 2026-11-27

@@ -1843,7 +1843,7 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 	u32 videoPatches = 0;
 	if( ConfigGetConfig(NIN_CFG_FORCE_PROG) || (ConfigGetVideoMode() & NIN_VID_FORCE) ||
 		(ConfigGetVideoOffset() != 0 && ConfigGetVideoOffset() >= -20 && ConfigGetVideoOffset() <= 20) ||
-		(ConfigGetVideoScale() != 0 && NinVideoScaleValid(ConfigGetVideoScale())) )
+		(ConfigGetVideoScale() != 0 && ConfigGetVideoScale() >= 40 && ConfigGetVideoScale() <= 120) )
 	{
 		PatchCount &= ~(FPATCH_VideoModes | FPATCH_VIConfigure | FPATCH_getTiming);
 		videoPatches = 1;
@@ -2236,7 +2236,7 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 							u32 width = ConfigGetVideoScale() + 600, xorig = (720 - width) / 2;
 							s32 off = ConfigGetVideoOffset();
 							if(off >= -20 && off <= 20)
-								xorig = (s32)xorig + off < 0 ? 0 : ((s32)xorig + off > (s32)NinMaxXOrigin(width) ? NinMaxXOrigin(width) : (u32)((s32)xorig + off));
+								xorig = (s32)xorig + off < 0 ? 0 : ((s32)xorig + off > 80 ? 80 : (u32)((s32)xorig + off));
 							u32 hook = PatchCopy(VIWidthHook, VIWidthHook_size);
 							write32(hook, first);
 							if(ConfigGetVideoScale() != 0)
@@ -2568,7 +2568,7 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 								break;
 						}
 					}
-					if(NinVideoScaleValid(ConfigGetVideoScale()))
+					if(ConfigGetVideoScale() >= 40 && ConfigGetVideoScale() <= 120)
 					{
 						W16((u32)Buffer+i+0xE, ConfigGetVideoScale() + 600);
 						W16((u32)Buffer+i+0xA, (720 - R16((u32)Buffer+i+0xE)) / 2);
@@ -2578,8 +2578,8 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 						u16 xorig = R16((u32)Buffer+i+0xA);
 						if((xorig + ConfigGetVideoOffset()) < 0)
 							W16((u32)Buffer+i+0xA, 0);
-						else if((xorig + ConfigGetVideoOffset()) > (s32)NinMaxXOrigin(R16((u32)Buffer+i+0xE)))
-							W16((u32)Buffer+i+0xA, NinMaxXOrigin(R16((u32)Buffer+i+0xE)));
+						else if((xorig + ConfigGetVideoOffset()) > 80)
+							W16((u32)Buffer+i+0xA, 80);
 						else
 							W16((u32)Buffer+i+0xA, xorig + ConfigGetVideoOffset());
 					}

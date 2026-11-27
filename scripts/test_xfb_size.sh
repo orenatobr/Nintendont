@@ -16,4 +16,6 @@ grep -q 'define NIN_XFB_MODE' loader/include/global.h || fail "NIN_XFB_MODE is n
 # The loader leaves the VI off (power-on state) right before it jumps to the game, and passes the state to the kernel log.
 grep -q 'vi\[1\] &= ~1' loader/source/main.c || fail "main.c does not switch the VI off before the jump"
 grep -q 'Loader VI at launch' kernel/Patch.c || fail "the kernel does not log the loader VI state"
+# The VI is parked on a black buffer at the top of MEM1 before the jump: the frame buffer of the loader sits where the game loads its data.
+grep -q 'SYS_SetArena1Hi(black)' loader/source/main.c || fail "main.c does not park the VI on a black buffer"
 echo "ok"

@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.25] - 2026-11-27
 
-Pre-release until a console run confirms it (Latest is fork.23).
+Pre-release until a console run confirms it (Latest is fork.23; loader.dol sha256 `6e13ea23...`).
 
 ### Fixed
 - The green band and noise before a game, fifth attempt, with the cause finally placed in time. The fork.24 run hung the loader after `Kernel Start`, and the user saw the glitch

@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.30] - 2026-11-27
 
-Pre-release (Latest is fork.23): an experiment that answers three questions with one console test. It contains fork.29 (no `HW_PPCSPEED` write on a Virtual Console launch).
+Pre-release (Latest is fork.23): an experiment that answers three questions with one console test (loader.dol sha256 `f7a5d185...`). It contains fork.29 (no `HW_PPCSPEED` write on a Virtual Console launch).
 
 ### Changed
 - A Virtual Console launch now waits 8 seconds in the loader right after the kernel tells it that it is ready (`NIN_BISECT_PAUSE`), and the kernel logs `Kernel ready, telling the loader`.

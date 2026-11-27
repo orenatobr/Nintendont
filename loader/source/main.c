@@ -1645,7 +1645,8 @@ int main(int argc, char **argv)
 			DCFlushRange(cur, VIDEO_GetFrameBufferSize(NIN_XFB_MODE));
 		}
 	}
-	VIDEO_SetBlack(FALSE);
+	//Teconmoon: the video stays black until the game takes over. Turning it on here showed the loader frame buffer in the new mode for a few frames,
+	//a green block between two black screens (upstream issue 1301). The game sets up its own video mode, so nothing needs this picture.
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	if(vmode->viTVMode & VI_NON_INTERLACE)

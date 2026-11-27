@@ -297,6 +297,16 @@ int _vsprintf(char *buf, const char *fmt, va_list args)
 	return str-buf;
 }
 
+//Teconmoon: formats the seconds prefix of a log line (a variadic wrapper, the kernel only has the va_list version)
+static int _timeprefix(char *buf, const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	int r = _vsprintf(buf, fmt, args);
+	va_end(args);
+	return r;
+}
+
 int dbgprintf( const char *fmt, ...)
 {
 	va_list args;
@@ -305,10 +315,15 @@ int dbgprintf( const char *fmt, ...)
 		return -1;
 	
 	//char *buffer = (char*)heap_alloc_aligned( 0, 2048, 32 );	
-	char buffer[0x100]; //get from stack
+	char buffer[0x120]; //get from stack
+
+	//Teconmoon: every line starts with the Starlet timer in seconds (HW_TIMER ticks about every 526.7 ns, so 1898 ticks are 1 ms), to see how long
+	//each step of the boot takes and to match a glitch on the screen with a step of the log. The timer wraps after about 37 minutes.
+	u32 ms = read32(0x0d800010) / 1898;
+	int off = _timeprefix(buffer, "[%u.%03u] ", ms / 1000, ms % 1000);
 
 	va_start(args, fmt);
-	_vsprintf(buffer, fmt, args);
+	_vsprintf(buffer + off, fmt, args);
 	va_end(args);
 
 	u32 read;	

@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.21] - 2026-11-27
 
-Latest. Includes the fork.20 fix (Resident Evil 4).
+Latest. Includes the fork.20 fix (Resident Evil 4) (loader.dol sha256 `d2dc4bb0...`).
 
 ### Fixed
 - The green block that flashed between two black screens after choosing a game (upstream issue 1301; fork.19 did not remove it,

@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.23] - 2026-11-27
+
+Latest (loader.dol sha256 `44c9694c...`). Includes the Resident Evil 4 fix of fork.22.
+
+### Fixed
+- Third attempt at the green block before a game (upstream issue 1301; fork.19 and fork.21 did not remove it). The user test shows black, a green
+  block about a tenth of the screen high and nearly as wide as the screen, black, then the game. The loader now switches the VI off (clears the enable bit of
+  DCR) right before it jumps to the game, the power-on state of a GameCube, instead of relying on the black mode of libogc, which still scans the frame buffer
+  on a Wii U. One line of the kernel log, `Loader VI at launch: marker=... fb=... TFBL=... BFBL=... DCR before=... after=...`, records the video state the loader
+  left, so the next step does not have to guess where the frame buffer lives. Check `scripts/test_xfb_size.sh`. Not yet confirmed on a console.
+
 ## [6.510-fork.22] - 2026-11-27
 
 Latest (loader.dol sha256 `e8c30e80...`). The green flash before a game is still open (fork.21 did not remove it).

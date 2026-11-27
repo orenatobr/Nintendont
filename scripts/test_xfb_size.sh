@@ -13,4 +13,7 @@ grep -q 'define NIN_XFB_MODE' loader/include/global.h || fail "NIN_XFB_MODE is n
 # The green block that flashed between two black screens when a game was chosen came from the loader turning the
 # video back on for a few frames after the mode switch. The video must stay black until the game takes over.
 ! grep -n 'VIDEO_SetBlack(FALSE)' loader/source/main.c || fail "main.c turns the video on during the game launch"
+# The loader leaves the VI off (power-on state) right before it jumps to the game, and passes the state to the kernel log.
+grep -q 'vi\[1\] &= ~1' loader/source/main.c || fail "main.c does not switch the VI off before the jump"
+grep -q 'Loader VI at launch' kernel/Patch.c || fail "the kernel does not log the loader VI state"
 echo "ok"

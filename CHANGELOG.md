@@ -8,6 +8,8 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.24] - 2026-11-27
 
+Latest (loader.dol sha256 `2af2d1d6...`). Includes the Resident Evil 4 fix of fork.22.
+
 ### Fixed
 - The green flash before a game, fourth attempt, now from a console video of fork.23 (the flash was still there). The video shows a green band about 7% of the
   screen high at the bottom, for about 1.3 seconds: first solid green (zeroed memory), then colored noise (the game writing). Switching the VI off was not

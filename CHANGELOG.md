@@ -6,6 +6,15 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.15] - 2026-11-27
+
+Confirmed on a Wii U by the owner: Tales of Symphonia fills the whole screen. The log of the run: one
+`GXAdjustForOverscan` candidate (`0x00113828`), `ver is 0 now`, and the game mode went from `efb=448 xfb=448
+yorig=16 h=448` to `efb=480 xfb=480 yorig=0 w=688 h=480` (`VTR` 480 lines). This release is the Latest. It also holds
+everything from fork.9 to fork.14 (the entries below): the Sunshine 480 line patch without Force Widescreen (the 4:3
+window, not tried on a console), the real video mode log, and the static letterbox table rule. Not tried on a
+console: Sunshine on this build, Sunshine without Force Widescreen, and other games.
+
 ### Added
 - `GXAdjustForOverscan` fix for games that build a 448 line letterbox mode from a 480 line one. The mode of
   Tales of Symphonia in the console log (`efb=448 xfb=448 yorig=16 h=448` out of 480 line tables, no 448 anywhere

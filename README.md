@@ -11,16 +11,18 @@ this fork in this repository, not to the upstream authors.
   off the game keeps its own 4:3 window. A letterboxed video mode table (for example 448 lines from line 16) is
   also stretched to all 480 lines. The video hardware cannot stretch vertically by itself, so black bars drawn
   inside a game's own picture (for example with a widescreen Gecko code) are not removed by this.
-* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.8`: Super Mario Sunshine fills
-  the whole screen with Force Widescreen on (confirmed by the owner). `v6.510-fork.9` to `v6.510-fork.13` are
-  pre-releases: they add the real video mode log, the 480 line patch for Sunshine without Force Widescreen
-  (the 4:3 window, not tried on a console yet) and diagnostics for Tales of Symphonia, whose thin horizontal bars
-  are not fixed yet. `v6.510-fork.3` and `v6.510-fork.4` crash a Wii U when XFB Scan is on; do not use them.
-  Rule of this fork: a build that touches the PPC hook or the video registers is a pre-release until a console
-  run confirms it. Stopping rule for Tales of Symphonia: if the diagnostic does not show the code that builds
-  its mode, it stays a documented follow-up and does not block the Sunshine work.
-* **Status: the automatic stretch does not exist yet.** What is built is the bar detector (XFB Scan, logging only)
-  and the plan for the stretch, tested on a Mac. Nothing in the fork crops or scales a game's picture yet.
+* **Releases, and what is confirmed on a console.** The Latest is `v6.510-fork.15`. Confirmed by the owner on a
+  Wii U: Super Mario Sunshine fills the whole screen with Force Widescreen on (since `fork.8`), and Tales of
+  Symphonia fills the whole screen (since `fork.15`, no setting needed). Not tried on a console yet: Sunshine
+  without Force Widescreen (the 4:3 window) and games other than these two. `v6.510-fork.3` and `v6.510-fork.4`
+  crash a Wii U when XFB Scan is on; do not use them. Rule of this fork: a build that touches the PPC hook or the
+  video registers is a pre-release until a console run confirms it.
+* **Why the bars appeared.** Sunshine runs a 448 line mode built by its own code; Tales of Symphonia gets its
+  448 line mode from the SDK function `GXAdjustForOverscan` with 16 lines taken off. The video interface cannot
+  scale vertically, so the fork makes those games keep 480 lines (`kernel/Patch.c`, `common/include/Sunshine480.h`,
+  `common/include/AdjustOverscan.h`).
+* **Status of the generic stretch.** There is no general crop or scale of a game's picture. The fork fixes the cause
+  per game family (see above), and XFB Scan (logging only) measures the real video mode of any game.
 * **Black bar detection (experimental).** The settings menu has XFB Scan (off by default). It logs the black bars
   of the picture to `ndebug.log`. It is the first step of an automatic stretch: Force Widescreen on fills the
   whole screen, off keeps a 4:3 window with side bars only. See [CHANGELOG.md](CHANGELOG.md).

@@ -6,7 +6,20 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.25] - 2026-11-27
+
+Pre-release until a console run confirms it (Latest is fork.23).
+
+### Fixed
+- The green band and noise before a game, fifth attempt, with the cause finally placed in time. The fork.24 run hung the loader after `Kernel Start`, and the user saw the glitch
+  BEFORE that hang, so it happens in the loader while it waits for the kernel (`DVDStartCache`, about a second), not in the game init. `GRRLIB_Exit` freed the two frame
+  buffers while the VI kept scanning them, and the next allocations reused that memory: zeros (green in YUV), then data (noise). fork.19, fork.21 and fork.23 acted too early or too
+  late for that. `GRRLIB_Exit` no longer frees the frame buffers (marker `NIN_KEEP_XFB`); they stay black until the game starts. The fork.24 black buffer is removed.
+  `scripts/test_xfb_size.sh` checks it. Not yet confirmed on a console.
+
 ## [6.510-fork.24] - 2026-11-27
+
+SUPERSEDED, do not use: the loader hangs before the game starts (kernel log ends at `Kernel Start`, no `DIP:Apploader`; the new code called `VIDEO_WaitVSync` after `__lwp_thread_closeall`, so the thread never wakes). Rolled back to fork.23; fixed in fork.25.
 
 Latest (loader.dol sha256 `2af2d1d6...`). Includes the Resident Evil 4 fix of fork.22.
 

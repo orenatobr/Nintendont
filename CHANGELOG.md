@@ -6,6 +6,15 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+### Fixed
+- The 4:3 window without Force Widescreen. The owner's test of Super Mario Sunshine with Force Widescreen off and
+  Wii U Widescreen on showed a picture stretched over the whole 16:9 screen (640 of 720 pixels, anamorphic), not a
+  4:3 window. Now, with Wii U Widescreen on, Force Widescreen off and no Video Width chosen, the width is 540 of
+  720 pixels (`NIN_WINDOW43_VIDEO_SCALE`, -60), centered at x origin 90, so the bars are on the sides only.
+  Force Widescreen (688) and a chosen Video Width (640 to 720) still win. The offset limit follows the width
+  (`NinMaxXOrigin`). Host test `scripts/test_video_fill.sh`. A game that draws its own 16:9 picture without Force
+  Widescreen would look squeezed; set `VideoScale = 40` for it. Not tried on a console.
+
 ## [6.510-fork.15] - 2026-11-27
 
 Confirmed on a Wii U by the owner: Tales of Symphonia fills the whole screen. The log of the run: one

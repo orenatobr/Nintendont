@@ -2583,7 +2583,8 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 						else
 							W16((u32)Buffer+i+0xA, xorig + ConfigGetVideoOffset());
 					}
-					{	//fill the height of a letterboxed table, with or without Force Widescreen
+					if(ConfigGetConfig(NIN_CFG_FORCE_WIDE))
+					{	//Force Widescreen also fills the height of a letterboxed table (never without it: Resident Evil 4 hung)
 						u16 xfbH = R16((u32)Buffer+i+8), yOrig = R16((u32)Buffer+i+0xC), viH = R16((u32)Buffer+i+0x10);
 						if(NinFillVertical(&xfbH, &yOrig, &viH))
 						{

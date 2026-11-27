@@ -6,6 +6,17 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.20] - 2026-11-27
+
+Fixes Resident Evil 4 hanging at start. Not yet confirmed on a console.
+
+### Fixed
+- Resident Evil 4 (USA) hung right after `Jumping to 0x80003100`. Its console log was the first one ever to show
+  `Patch:VI table ... filled vertically to 480 lines`: the vertical fill of letterboxed static tables, which
+  fork.9 made run without Force Widescreen, had never run on a console (Sunshine and Tales of Symphonia do not
+  use it). It changes the xfb height of the table to 480 while the game still draws 448 lines, and the game
+  may size its own frame buffers for 448. The fill only runs again with Force Widescreen on, as in fork.2.
+
 ## [6.510-fork.19] - 2026-11-27
 
 Latest. Fixes the green stripe before a game starts (loader.dol sha256 `42d31340...`).

@@ -8,7 +8,7 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [6.510-fork.29] - 2026-11-27
 
-Pre-release (Latest is fork.23): an experiment, with a measurement that settles it.
+Pre-release (Latest is fork.23): an experiment, with a measurement that settles it; loader.dol sha256 `635331af...`).
 
 ### Fixed
 - Green band before a game (upstream issue 1301). The fork.28 log shows the VI black from the launcher to the jump (`Loader VI step 3` VTR 000c) and the band still there, so the loader

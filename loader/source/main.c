@@ -1674,6 +1674,19 @@ int main(int argc, char **argv)
 	}
 	//Teconmoon: the video stays black until the game takes over. Turning it on here showed the loader frame buffer in the new mode for a few frames,
 	//a green block between two black screens (upstream issue 1301). The game sets up its own video mode, so nothing needs this picture.
+	//Teconmoon (NIN_VC_BLACK_XFB, experiment): the loader frame buffer sits where the game DOL is loaded (0x80343B00 for a big DOL), so by the time the game turns the VI on
+	//the TFBL still points at the DOL data (zero = green, data = noise): the green band before the game (upstream issue 1301). Point the VI at a black buffer at the top of
+	//the MEM1 arena, outside the DOL, until the game sets its own frame buffer.
+	if(argsboot)
+	{
+		u32 sz = VIDEO_GetFrameBufferSize(NIN_XFB_MODE);
+		void *blk = (void*)(((u32)SYS_GetArena1Hi() - sz - 0x100000) & ~0x1Fu);
+		blk = MEM_K0_TO_K1(blk);
+		VIDEO_ClearFrameBuffer(NIN_XFB_MODE, blk, COLOR_BLACK);
+		DCFlushRange(blk, sz);
+		VIDEO_SetNextFramebuffer(blk);
+		gprintf("Black XFB at %p size %08x\r\n", blk, sz);
+	}
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	if(vmode->viTVMode & VI_NON_INTERLACE)

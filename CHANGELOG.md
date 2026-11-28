@@ -6,6 +6,12 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.34] - 2026-11-28
+
+Pre-release (Latest is fork.23): an experiment, pass or fail on the green band. The loader XFB sits at 0x80343B00, inside the memory the game DOL is loaded into, so when the game turns the VI on
+the TFBL still points at DOL data. A Virtual Console (autoboot) launch now points the VI at a black buffer at the top of the MEM1 arena, outside the DOL. The loader logs `Black XFB at <addr>`.
+Not yet confirmed on a console.
+
 ## [6.510-fork.33] - 2026-11-28
 
 Withdrawn. The diagnostic build froze the console: the kernel reads the VI registers at `0x0D002000` from the ARM and that access hangs, so the first sample never ran.

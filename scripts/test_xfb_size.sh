@@ -27,6 +27,6 @@ grep -q 'Loader VI step' kernel/Patch.c || fail "the kernel does not log the VI 
 # HW_PPCSPEED is written again (the fork.30 log showed it changes nothing on a VC launch) and the loader pause of fork.30 is gone.
 ! grep -q 'sleep(8)' loader/source/main.c || fail "the bisect pause is still there"
 ! grep -q 'skipped on Wii VC' kernel/main.c || fail "the kernel still skips HW_PPCSPEED"
-# A Virtual Console (autoboot) launch does not initialise the audio hardware in the loader.
-tr -d '\r' < loader/source/global.c | grep -B1 -A2 'if(autoboot == false)$' | grep -q 'AUDIO_Init(NULL)' || fail "AUDIO_Init is not guarded by autoboot"
+# A Virtual Console (autoboot) launch skips the GPU init (GX_Init) in the loader (fork.32 experiment); audio is initialised as always.
+grep -q 'if (nin_keep_black)' loader/source/grrlib.c || fail "GRRLIB_Init does not skip GX in autoboot"; [ "$(grep -c 'if (nin_keep_black)' loader/source/grrlib.c)" -ge 3 ] || fail "GX skip missing in Init/Exit/Render"
 echo "ok"

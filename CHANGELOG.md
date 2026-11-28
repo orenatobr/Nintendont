@@ -6,6 +6,11 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.33] - 2026-11-28
+
+Withdrawn. The diagnostic build froze the console: the kernel reads the VI registers at `0x0D002000` from the ARM and that access hangs, so the first sample never ran.
+The sampler is reverted, `main` is back to the fork.32 loader.dol. Lesson: the VI state has to be read by the PPC loader (as SnapVI does), not by the kernel.
+
 ## [6.510-fork.32] - 2026-11-28
 
 Pre-release (Latest is fork.23): an experiment, pass or fail on the green band. fork.31 (no audio init) did not remove it and is reverted.

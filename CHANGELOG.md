@@ -6,6 +6,12 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.33] - 2026-11-28
+
+Pre-release (Latest is fork.23): a diagnostic build, no fix claimed. fork.32 (no GPU init on VC) did not remove the band. The kernel now logs `VIS:` lines in ndebug.log,
+with its clock, at every change of the VI state (VTR/DCR, TFBL, BFBL) and of what the scanned frame buffer holds at the top, middle and bottom (Z zero = green, B black, D data).
+It shows when the VI starts scanning and what it scans, without timing it by eye. Not yet confirmed on a console.
+
 ## [6.510-fork.32] - 2026-11-28
 
 Pre-release (Latest is fork.23): an experiment, pass or fail on the green band. fork.31 (no audio init) did not remove it and is reverted.

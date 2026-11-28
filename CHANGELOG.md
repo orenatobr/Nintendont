@@ -6,6 +6,16 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.36] - 2026-11-28
+
+Pre-release (Latest is fork.23): a diagnostic build, no fix claimed. fork.34 (the VI pointed at a black buffer outside the game DOL, confirmed by the log: TFBL=100b257f is 0x0164AFE0) did not remove the band, so
+the stale loader frame buffer is refuted. A film of the band shows it comes about 10.8 s after the launcher screen goes black and about 23 s before the first game output, so it is well before the jump,
+in the loader or kernel boot, which the kernel log cannot time. Two instruments:
+- The loader stamps its clock (gettick) at 8 steps (start of main, after Initialise, after WiiDRC_Init, before and after the kernel launch, kernel ready, after the menu video setup, before the video switch)
+  and the kernel prints `Loader step N: at X ms` in ndebug.log, so the film time of the band can be matched to a loader step.
+- The kernel can hold the boot for 12 s at a chosen phase when `/teconmoon/hold.txt` starts with `1` (after "Kernel Start"), `2` (right before "Jumping to") or `3` (both). Without the file nothing changes.
+Not yet confirmed on a console.
+
 ## [6.510-fork.33] - 2026-11-28
 
 Withdrawn. The diagnostic build froze the console: the kernel reads the VI registers at `0x0D002000` from the ARM and that access hangs, so the first sample never ran.

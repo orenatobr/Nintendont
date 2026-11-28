@@ -659,7 +659,7 @@ static void SnapVI(int step)
 	snap[4] = *(vu32*)0xCC002010; //VTE
 	snap[5] = *(vu32*)0xCC00201C; //TFBL
 	snap[6] = *(vu32*)0xCC002048; //HSR
-	snap[7] = *(vu32*)0xCC00206C; //PICCONF
+	snap[7] = gettick(); //Teconmoon fork.36: the time base (60750 ticks per ms) instead of PICCONF, so the kernel log shows how long each loader step took
 	DCFlushRange((void*)snap, 0x20);
 }
 
@@ -710,6 +710,7 @@ int main(int argc, char **argv)
 
 	WiiDRC_Init();
 	isWiiVC = WiiDRC_Inited();
+	SnapVI(4); //after WiiDRC_Init
 	if(isWiiVC)
 	{
 		//Clear out stubs to make it (hopefully) reboot properly
@@ -826,8 +827,10 @@ int main(int argc, char **argv)
 	else //will disable gamepad spot for player 1
 		*(vu32*)0x92FFFFC4 = 0;
 	DCFlushRange((void*)0x92FFFFC0,0x20);
+	SnapVI(5); //kernel ready to be launched
 	fd = IOS_Open( dev_es, 0 );
 	IOS_IoctlvAsync(fd, 0x1F, 0, 0, IOCTL_Buf, NULL, NULL);
+	SnapVI(6); //kernel launch issued
 	//Waiting for Nintendont...
 	if(argsboot == false)
 		ShowMessageScreen("Waiting for Nintendont...");
@@ -1399,7 +1402,10 @@ int main(int argc, char **argv)
 	{
 		DCInvalidateRange( STATUS, 0x20 );
 		if( STATUS_LOADING == 0xdeadbeef )
+		{
+			SnapVI(7); //kernel says it is ready
 			break;
+		}
 
 		if(argsboot == false)
 		{

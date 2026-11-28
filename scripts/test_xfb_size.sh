@@ -22,11 +22,16 @@ grep -q 'nin_keep_black = argsboot' loader/source/main.c || fail "main.c does no
 # A Virtual Console launch (autoboot) must not change the VI width in the menu video setup; the VI registers are logged at 4 steps.
 grep -q 'if(argsboot == false)' loader/source/main.c || fail "main.c has no autoboot guard"
 tr -d '\r' < loader/source/main.c | grep -A1 'if(argsboot == false)$' | grep -q 'ReconfigVideo(rmode)' || fail "ReconfigVideo(rmode) is not guarded by autoboot"
-[ "$(grep -c 'SnapVI(' loader/source/main.c)" = 5 ] || fail "SnapVI is not called at the 4 steps"
-grep -q 'Loader VI step' kernel/Patch.c || fail "the kernel does not log the VI steps"
+[ "$(grep -c 'SnapVI(' loader/source/main.c)" = 9 ] || fail "SnapVI is not called at the 8 steps"
+grep -q 'Loader step' kernel/Patch.c || fail "the kernel does not log the loader steps"
 # HW_PPCSPEED is written again (the fork.30 log showed it changes nothing on a VC launch) and the loader pause of fork.30 is gone.
 ! grep -q 'sleep(8)' loader/source/main.c || fail "the bisect pause is still there"
 ! grep -q 'skipped on Wii VC' kernel/main.c || fail "the kernel still skips HW_PPCSPEED"
 # A Virtual Console (autoboot) launch skips the GPU init (GX_Init) in the loader (fork.32 experiment); audio is initialised as always.
 grep -q 'if (nin_keep_black)' loader/source/grrlib.c || fail "GRRLIB_Init does not skip GX in autoboot"; [ "$(grep -c 'nin_keep_black)' loader/source/grrlib.c)" -ge 3 ] || fail "GX skip missing in Init/Exit/Render"
+# fork.35 diagnostic: phase holds driven by /teconmoon/hold.txt.
+tr -d '\r' < kernel/Patch.c | grep -q 'HoldAt(2);' || fail "no hold at phase 2"
+tr -d '\r' < kernel/main.c | grep -q 'HoldAt(1);' || fail "no hold at phase 1"
+tr -d '\r' < loader/source/main.c | grep -q 'SnapVI(7);' || fail "no loader step clock"
+tr -d '\r' < kernel/Patch.c | grep -q 'Loader step %d: at %d ms' || fail "kernel does not print the loader clock"
 echo "ok"

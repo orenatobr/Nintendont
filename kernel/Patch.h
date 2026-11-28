@@ -63,4 +63,5 @@ void PatchGame();
 void MPattern( u8 *Data, u32 Length, FuncPattern *FunctionPattern );
 int CPattern( FuncPattern *FPatA, FuncPattern *FPatB  );
 
+void HoldAt(int phase);
 #endif

@@ -393,6 +393,7 @@ int _main( int argc, char *argv[] )
 	BootStatus(0xdeadbeef, s_size, s_cnt);
 	mdelay(1000); //wait before hw flag changes
 	dbgprintf("Kernel Start\r\n");
+	HoldAt(1);
 #ifdef USE_OSREPORTDM
 	write32( 0x1860, 0xdeadbeef );	// Clear OSReport area
 	sync_after_write((void*)0x1860, 0x20);

@@ -1319,6 +1319,27 @@ static bool fileExist(const char *path)
 	return false;
 }
 
+/* Teconmoon (fork.35 diagnostic, upstream issue 1301): phase bisection of the green band. If /teconmoon/hold.txt starts with the phase number (1 or 2), or with 3 for both,
+   the kernel waits 12 s at that phase and logs it: 1 = after "Kernel Start" (the loader runs its video steps, no game yet), 2 = right before "Jumping to" (the DOL is loaded
+   and patched, the PPC still waits). Without the file nothing changes. */
+void HoldAt(int phase)
+{
+	FIL fd;
+	char c = 0;
+	u32 got = 0, i;
+	if(f_open_char(&fd, "/teconmoon/hold.txt", FA_READ|FA_OPEN_EXISTING) != FR_OK)
+		return;
+	if(f_read(&fd, &c, 1, &got) != FR_OK)
+		got = 0;
+	f_close(&fd);
+	if(got != 1 || !(c == '0' + phase || c == '3'))
+		return;
+	dbgprintf("HOLD %d: waiting 12 s\r\n", phase);
+	for(i = 0; i < 12; ++i)
+		mdelay(1000);
+	dbgprintf("HOLD %d: done\r\n", phase);
+}
+
 u32 XfbScanBase = 0, XfbScanLen = 0;	//Teconmoon: the game code that XFB Scan may search (the biggest DOL buffer seen)
 void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 {
@@ -1637,11 +1658,11 @@ void DoPatches( char *Buffer, u32 Length, u32 DiscOffset )
 		dbgprintf("Loader VI at launch: marker=%08x fb=%08x TFBL=%08x BFBL=%08x DCR before=%04x after=%04x\r\n", read32(0x13003FC0),
 			read32(0x13003FC4), read32(0x13003FC8), read32(0x13003FCC), read32(0x13003FD0), read32(0x13003FD4));
 		int snap;
-		sync_before_read((void*)0x13003E00, 0x80);
-		for(snap = 0; snap < 4; snap++)
-			dbgprintf("Loader VI step %d: VTR/DCR=%08x HTR0=%08x HTR1=%08x VTO=%08x VTE=%08x TFBL=%08x HSR=%08x PICCONF=%08x\r\n", snap,
-				read32(0x13003E00 + snap*0x20), read32(0x13003E04 + snap*0x20), read32(0x13003E08 + snap*0x20), read32(0x13003E0C + snap*0x20),
-				read32(0x13003E10 + snap*0x20), read32(0x13003E14 + snap*0x20), read32(0x13003E18 + snap*0x20), read32(0x13003E1C + snap*0x20));
+		sync_before_read((void*)0x13003E00, 0x100);
+		for(snap = 0; snap < 8; snap++)
+			dbgprintf("Loader step %d: at %d ms (loader clock, 0 = start of main) VTR/DCR=%08x TFBL=%08x\r\n", snap,
+				(int)((read32(0x13003E1C + snap*0x20) - read32(0x13003E1C)) / 60750),
+				read32(0x13003E00 + snap*0x20), read32(0x13003E14 + snap*0x20));
 	}
 
 	/* for proper dol detection in PSO */
@@ -4941,6 +4962,7 @@ void PatchGame()
 	if ((TITLE_ID) != 0x474f37)  // 007 Nightfire
 		Command2 |= 0x80000000;
 	write32( FLUSH_ADDR, Command2 );
+	HoldAt(2);
 	dbgprintf("Jumping to 0x%08X\n", GameEntry);
 	sync_after_write((void*)0x1000, 0x2000); //low patches
 	write32( RESET_STATUS, GameEntry );

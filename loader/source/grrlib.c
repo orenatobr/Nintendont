@@ -127,6 +127,17 @@ int  GRRLIB_Init (void) {
 	// If the TV image is interlaced it takes two passes to display the image
 	if (rmode->viTVMode & VI_NON_INTERLACE)  VIDEO_WaitVSync();
 
+	//Teconmoon (NIN_VC_NO_GX, experiment): a Virtual Console (autoboot) launch draws nothing, so the GPU is not initialised (upstream issue 1301)
+	if (nin_keep_black)
+	{
+		is_setup = true;
+		enable_output = false;
+#ifdef ENABLE_TTF
+		if (GRRLIB_InitTTF())  error_code = -3;
+#endif
+		return error_code;
+	}
+
 	// The FIFO is the buffer the CPU uses to send commands to the GPU
 	if ( !(gp_fifo = memalign(32, DEFAULT_FIFO_SIZE)) )  return -1;
 	memset(gp_fifo, 0, DEFAULT_FIFO_SIZE);
@@ -217,6 +228,15 @@ void  GRRLIB_Exit (void)
 		return;
 	else
 		is_setup = false;
+
+	if (nin_keep_black)
+	{
+		//Teconmoon (NIN_VC_NO_GX): the GPU was never initialised, nothing to shut down
+#ifdef ENABLE_TTF
+		GRRLIB_ExitTTF();
+#endif
+		return;
+	}
 
 	// Allow write access to the full screen
 	GX_SetClipMode( GX_CLIP_DISABLE );

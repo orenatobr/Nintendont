@@ -6,6 +6,12 @@ All notable changes of this fork are listed here. The fork follows
 
 ## [Unreleased]
 
+## [6.510-fork.32] - 2026-11-28
+
+Pre-release (Latest is fork.23): an experiment, pass or fail on the green band. fork.31 (no audio init) did not remove it and is reverted.
+A Virtual Console (autoboot) launch no longer runs `GX_Init` and the GPU setup in `GRRLIB_Init`, and `GRRLIB_Exit` no longer draws black frames.
+Not yet confirmed on a console.
+
 ## [6.510-fork.31] - 2026-11-27
 
 Pre-release (Latest is fork.23): an experiment, pass or fail on the green band; loader.dol sha256 `323433aa...`).

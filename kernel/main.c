@@ -199,38 +199,6 @@ static void XfbBarScan(void)
 		read32(NIN_XFB_SCAN_MEM + 8), read32(NIN_XFB_SCAN_MEM + 12), read32(NIN_XFB_SCAN_MEM + 16));
 }
 
-/* Teconmoon (fork.33 diagnostic, upstream issue 1301): logs, with the kernel clock, every change of the VI state and of what the scanned frame buffer holds
-   (Z = zero, i.e. green, B = black, D = data) at the top, middle and bottom, so the moment of the green band is read from the log, not from the user. */
-static void ViSample(void)
-{
-	static u32 t = 0, n = 0, lastKey = 0xFFFFFFFF;
-	u32 vd, tf, bf, a, key, k[3] = {'-', '-', '-'}, i;
-	if(n >= 500 || TimerDiffTicks(t) < 95000) //about 50 ms
-		return;
-	t = read32(HW_TIMER);
-	vd = read32(0x0D002000);
-	tf = read32(0x0D00201C);
-	bf = read32(0x0D002024);
-	a = tf & 0x01FFFFFF;
-	if(a != 0 && a < 0x01700000)
-	{
-		static const u32 off[3] = { 0, 0x60000, 0xA0000 };
-		for(i = 0; i < 3; ++i)
-		{
-			u32 w;
-			sync_before_read((void*)((a + off[i]) & ~31u), 0x20);
-			w = read32(a + off[i]);
-			k[i] = w == 0 ? 'Z' : ((w & 0xFF00FF00) == 0x00800080 || (w & 0xFF00FF00) == 0x10801080) ? 'B' : 'D';
-		}
-	}
-	key = vd ^ (tf << 3) ^ (bf << 7) ^ (k[0] << 24) ^ (k[1] << 16) ^ (k[2] << 8);
-	if(key == lastKey)
-		return;
-	lastKey = key;
-	n++;
-	dbgprintf("VIS: VTR/DCR=%08x TFBL=%08x BFBL=%08x top/mid/bottom=%c%c%c\r\n", vd, tf, bf, k[0], k[1], k[2]);
-}
-
 int _main( int argc, char *argv[] )
 {
 	//BSS is in DATA section so IOS doesnt touch it, we need to manually clear it
@@ -528,7 +496,6 @@ int _main( int argc, char *argv[] )
 			loopCnt = 0;
 		}
 #endif
-		ViSample();
 		if(ConfigGetConfig(NIN_CFG_XFB_SCAN) && TimerDiffTicks(XfbScanTimer) > 1898437) //about every second
 		{
 			XfbBarScan();
